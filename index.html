@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AutoDock — 90-Day Plan Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #06101E;
+    --surface: #0B1628;
+    --surface2: #0F1E35;
+    --surface3: #142340;
+    --border: #1C2E48;
+    --border2: #162038;
+    --text: #D6E4F7;
+    --text2: #94B0CE;
+    --text3: #5A7A9E;
+    --text4: #324D6A;
+    --accent: #08111F;
+    --accent2: #0C1A30;
+    --indigo: #6C8EFF;
+    --indigo-dim: #1E3060;
+    --green: #2DD4BF;
+    --amber: #FBBF24;
+    --red: #F87171;
+    --blue: #38BDF8;
+    --purple: #A78BFA;
+    --pink: #F472B6;
+    --teal: #14B8A6;
+    --orange: #FB923C;
+  }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+    background-image: radial-gradient(ellipse at 15% 0%, rgba(30,60,120,0.35) 0%, transparent 55%),
+                      radial-gradient(ellipse at 85% 100%, rgba(10,30,70,0.25) 0%, transparent 45%);
+    background-attachment: fixed;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #07121F 0%, #0C1A30 50%, #091626 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 0 rgba(108,142,255,0.1), 0 4px 24px rgba(0,0,0,0.5);
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo { font-size: 18px; font-weight: 700; color: #E2EBF8; letter-spacing: -0.5px; }
+  .logo span { color: var(--text3); font-weight: 400; font-size: 14px; }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.3px; }
+  .badge-white { background: rgba(108,142,255,0.12); color: #94B0CE; border: 1px solid rgba(108,142,255,0.2); }
+  .badge-green { background: rgba(45,212,191,0.15); color: #2DD4BF; border: 1px solid rgba(45,212,191,0.25); }
+  .badge-blue { background: rgba(56,189,248,0.12); color: #38BDF8; border: 1px solid rgba(56,189,248,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: #FBBF24; border: 1px solid rgba(251,191,36,0.2); }
+  .badge-red { background: rgba(248,113,113,0.12); color: #F87171; border: 1px solid rgba(248,113,113,0.2); }
+  .header-right { display: flex; gap: 6px; align-items: center; }
+
+  /* ── TABS ── */
+  .tabs-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-bar::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    padding: 13px 20px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text3);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  .tab-btn:hover { color: var(--text2); }
+  .tab-btn.active { color: var(--indigo); border-bottom-color: var(--indigo); }
+
+  /* ── MAIN ── */
+  .main { padding: 24px 28px; max-width: 1600px; margin: 0 auto; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--surface2);
+  }
+  .card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); }
+
+  /* ── TABLE ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead tr { background: var(--surface2); }
+  thead th {
+    padding: 9px 10px;
+    text-align: left;
+    color: var(--text3);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border2); transition: background 0.12s; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 8px 10px; vertical-align: middle; }
+  .phase-row td { background: var(--surface2); font-weight: 700; font-size: 11px; color: var(--text2); padding: 6px 10px; border-top: 1px solid var(--border); }
+  .phase-row td:first-child { padding-left: 12px; }
+
+  /* ── STATUS BADGES ── */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    gap: 4px;
+  }
+  .s-not-started { background: rgba(90,122,158,0.15); color: #6E8BAD; border: 1px solid rgba(90,122,158,0.25); }
+  .s-in-progress  { background: rgba(56,189,248,0.12); color: #38BDF8; border: 1px solid rgba(56,189,248,0.25); }
+  .s-done         { background: rgba(45,212,191,0.12); color: #2DD4BF; border: 1px solid rgba(45,212,191,0.25); }
+  .s-blocked      { background: rgba(248,113,113,0.12); color: #F87171; border: 1px solid rgba(248,113,113,0.25); }
+  .s-conditional  { background: rgba(251,191,36,0.12); color: #FBBF24; border: 1px solid rgba(251,191,36,0.25); }
+
+  /* ── PRIORITY ── */
+  .prio { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .p-high   { background: rgba(248,113,113,0.15); color: #F87171; }
+  .p-med    { background: rgba(251,191,36,0.12); color: #FBBF24; }
+  .p-low    { background: rgba(45,212,191,0.12); color: #2DD4BF; }
+
+  /* ── OWNER TAGS ── */
+  .owner-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px;
+    white-space: nowrap; margin: 1px;
+    border: 1px solid transparent;
+  }
+  .owner-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── STATUS SELECT ── */
+  .status-select {
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 3px 10px;
+    font-size: 10px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;
+  }
+  .status-select option { background: #0B1628; color: #D6E4F7; }
+
+  /* ── GANTT ── */
+  .gantt-wrap { overflow-x: auto; }
+  .gantt-table { border-collapse: collapse; font-size: 11px; }
+  .gantt-table th, .gantt-table td { padding: 0; }
+  .gantt-label {
+    min-width: 260px; max-width: 260px; width: 260px;
+    padding: 6px 10px; border-right: 2px solid var(--border);
+    border-bottom: 1px solid var(--border2);
+    font-size: 11px; vertical-align: middle;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .gantt-week-hdr {
+    width: 44px; min-width: 44px; max-width: 44px;
+    text-align: center; padding: 6px 0; font-size: 10px;
+    font-weight: 700; color: var(--text3);
+    border-right: 1px solid var(--border2); border-bottom: 2px solid var(--border);
+    background: var(--surface2);
+  }
+  .gantt-cell {
+    width: 44px; min-width: 44px; max-width: 44px;
+    text-align: center; padding: 3px 1px;
+    border-right: 1px solid var(--border2); border-bottom: 1px solid var(--border2);
+    position: relative;
+  }
+  .gantt-bar { height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+  .gantt-bar-start { border-radius: 4px 0 0 4px; }
+  .gantt-bar-end   { border-radius: 0 4px 4px 0; }
+  .gantt-bar-mid   { border-radius: 0; }
+  .gantt-bar-solo  { border-radius: 4px; }
+  .gantt-phase-row td { background: var(--surface2); }
+  .gantt-phase-label { font-weight: 700; font-size: 10.5px; color: var(--text2); }
+  .gantt-task-label { color: var(--text2); font-size: 11px; }
+  .gantt-owner-label { color: var(--text4); font-size: 10px; margin-top: 1px; }
+
+  /* ── MILESTONES ── */
+  .milestone-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 18px; border-bottom: 1px solid var(--border2);
+  }
+  .milestone-item:last-child { border-bottom: none; }
+  .ms-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .ms-phase { font-size: 10px; font-weight: 700; color: var(--text4); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .ms-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .ms-meta { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+  .ms-criteria { font-size: 11px; color: var(--text3); font-style: italic; }
+  .ms-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+  .ms-header { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 18px 4px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+
+  /* ── TEAM WORKLOAD ── */
+  .workload-cell {
+    width: 44px; min-width: 44px; max-width: 44px;
+    text-align: center; padding: 5px 2px;
+    border-right: 1px solid var(--border2); font-size: 11px; font-weight: 600;
+  }
+  .wl-0 { color: var(--text4); }
+  .wl-1 { background: rgba(45,212,191,0.15); color: #2DD4BF; }
+  .wl-2 { background: rgba(56,189,248,0.12); color: #38BDF8; }
+  .wl-3 { background: rgba(251,191,36,0.15); color: #FBBF24; }
+  .wl-4 { background: rgba(248,113,113,0.15); color: #F87171; }
+  .wl-5 { background: rgba(244,114,182,0.15); color: #F472B6; }
+
+  /* ── OVERVIEW PHASE CARDS ── */
+  .phase-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .phase-card {
+    background: var(--surface); border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--indigo);
+    padding: 16px 18px;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .phase-card:hover { box-shadow: 0 6px 30px rgba(0,0,0,0.5); border-color: var(--border); }
+  .pc-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .pc-num { font-size: 10px; font-weight: 700; color: var(--text4); text-transform: uppercase; letter-spacing: 0.5px; }
+  .pc-weeks { font-size: 10px; font-weight: 700; background: var(--surface2); color: var(--text3); padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); }
+  .pc-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .pc-deliverable { font-size: 11.5px; color: var(--text3); margin-bottom: 10px; }
+  .pc-owners { display: flex; flex-wrap: wrap; gap: 4px; }
+
+  /* ── GTM ── */
+  .gtm-track { margin-bottom: 20px; }
+  .gtm-track-header {
+    background: var(--surface2); border-bottom: 1px solid var(--border); color: var(--text2); padding: 10px 16px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px;
+    border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 8px;
+  }
+  .gtm-track-body { background: var(--surface); border-radius: 0 0 8px 8px; border: 1px solid var(--border); border-top: none; overflow: hidden; }
+  .gtm-note { background: rgba(148,163,184,0.05); color: var(--text3); font-size: 11px; padding: 8px 14px; border-bottom: 1px solid var(--border); font-style: italic; }
+
+  /* ── STAT BAR ── */
+  .stat-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--surface); border-radius: 10px;
+    padding: 14px 18px; flex: 1; min-width: 120px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--border);
+  }
+  .stat-num { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 11px; color: var(--text3); font-weight: 500; }
+
+  /* ── FILTER BAR ── */
+  .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .filter-btn {
+    padding: 5px 13px; border-radius: 20px; border: 1px solid var(--border);
+    font-size: 11px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    background: var(--surface); color: var(--text3); cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center; gap: 5px;
+  }
+  .filter-btn:hover { border-color: var(--text3); color: var(--text2); background: var(--surface2); }
+  .filter-btn.active { background: var(--indigo-dim); color: var(--indigo); border-color: rgba(108,142,255,0.4); }
+
+  /* ── NOTES INPUT ── */
+  .notes-input {
+    width: 100%; border: 1px solid transparent; border-radius: 4px;
+    padding: 3px 6px; font-size: 11.5px; color: var(--text3);
+    font-family: 'DM Sans', sans-serif; background: transparent; outline: none;
+    font-style: italic;
+  }
+  .notes-input:focus { border-color: var(--border); background: var(--surface2); font-style: normal; color: var(--text); }
+  .notes-input::placeholder { color: var(--text4); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text4); }
+
+  /* ── CURRENT WEEK highlight in gantt ── */
+  .gantt-current-week { background: rgba(108,142,255,0.07) !important; }
+  .gantt-current-week-hdr { background: rgba(108,142,255,0.12) !important; color: var(--indigo) !important; }
+
+  select.status-select option { font-size: 12px; }
+
+  @media (max-width: 600px) {
+    .main { padding: 14px; }
+    .header { padding: 12px 16px; }
+    .tabs-bar { padding: 0 14px; }
+    .phase-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── TEAM MEMBER CARDS (clickable) ── */
+  .team-member-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.18s;
+    min-width: 200px;
+  }
+  .team-member-card:hover {
+    border-color: var(--member-color, var(--indigo));
+    box-shadow: 0 0 0 1px var(--member-color, var(--indigo)), 0 4px 20px rgba(0,0,0,0.4);
+    background: var(--surface3);
+    transform: translateY(-1px);
+  }
+  .team-member-card.selected {
+    border-color: var(--member-color, var(--indigo));
+    box-shadow: 0 0 0 2px var(--member-color, var(--indigo)), 0 6px 24px rgba(0,0,0,0.5);
+    background: var(--surface3);
+  }
+  .tm-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .tm-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .tm-role { font-size: 10px; color: var(--text3); }
+  .tm-stats { font-size: 10px; font-weight: 700; margin-top: 4px; }
+
+  /* ── MEMBER TASK DRAWER ── */
+  .member-drawer {
+    display: none;
+    margin-top: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.5);
+    animation: slideDown 0.2s ease;
+  }
+  .member-drawer.open { display: block; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .drawer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .drawer-close {
+    width: 28px; height: 28px; border-radius: 50%; border: none;
+    background: var(--surface3); color: var(--text3);
+    font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .drawer-close:hover { background: rgba(248,113,113,0.2); color: #F87171; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo">🚀 AutoDock <span>/ 90-Day Plan</span></div>
+    <div class="header-badges">
+      <span id="hdr-start" class="badge badge-white">Start: —</span>
+      <span id="hdr-end" class="badge badge-white">End: —</span>
+      <span id="hdr-weeks" class="badge badge-white">18 Weeks</span>
+      <span id="hdr-progress" class="badge badge-blue">0% Done</span>
+      <span class="badge badge-white">Simulation Only</span>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div id="header-stats" class="header-badges"></div>
+    <span id="sync-status" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid;cursor:default;transition:all 0.3s">○ Not connected</span>
+    <button id="reconnect-link" onclick="showSetupBanner()" title="Change Google Sheets connection" style="display:none;background:none;border:none;color:var(--text4);font-size:11px;cursor:pointer;padding:2px 6px;font-family:'DM Sans',sans-serif;transition:color 0.15s" onmouseover="this.style.color='var(--text2)'" onmouseout="this.style.color='var(--text4)'">⚙ reconnect</button>
+    <button onclick="manualSync()" title="Sync now" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(108,142,255,0.3);background:rgba(108,142,255,0.1);color:#6C8EFF;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.background='rgba(108,142,255,0.2)'" onmouseout="this.style.background='rgba(108,142,255,0.1)'">⟳</button>
+  </div>
+</header>
+
+<!-- ══════════════ TABS ══════════════ -->
+<nav class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('overview')">📋 Overview</button>
+  <button class="tab-btn" onclick="switchTab('tracker')">📅 Weekly Tracker</button>
+  <button class="tab-btn" onclick="switchTab('milestones')">🎯 Milestones</button>
+  <button class="tab-btn" onclick="switchTab('gantt')">📊 Gantt Chart</button>
+  <button class="tab-btn" onclick="switchTab('workload')">👥 Team Workload</button>
+  <button class="tab-btn" onclick="switchTab('gtm')">💼 GTM Track</button>
+</nav>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<main class="main">
+
+  <!-- ── OVERVIEW ── -->
+  <div id="panel-overview" class="panel active">
+    <!-- Stats -->
+    <div class="stat-bar" id="ov-stats"></div>
+    <!-- Team -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <span class="card-title">Team Roster</span>
+        <span style="font-size:11px;color:var(--text4)">Click a member to see their tasks</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;padding:16px 18px;" id="ov-team"></div>
+      <div id="member-drawer" class="member-drawer"></div>
+    </div>
+    <!-- Phase cards -->
+    <div class="card-title" style="margin-bottom:10px;padding:0 2px;">Phase Summary</div>
+    <div class="phase-grid" id="ov-phases"></div>
+
+    <!-- Google Sheets Setup Banner -->
+    <div id="setup-banner" style="background:var(--surface);border:1px solid rgba(108,142,255,0.3);border-radius:12px;padding:20px 24px;margin-top:4px;display:flex;align-items:flex-start;gap:16px;box-shadow:0 4px 20px rgba(0,0,0,0.4)">
+      <div style="font-size:28px;line-height:1;flex-shrink:0">🔗</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Connect to Google Sheets</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.6">
+          Once you've deployed the Apps Script (see setup guide), paste your Web App URL below and click <strong style="color:var(--indigo)">Connect</strong>.
+          Then hit <strong style="color:#2DD4BF">Push all data to Sheet</strong> once to seed the sheet with all tasks.
+          After that, every status/notes change syncs live automatically.
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input id="gas-url-input" type="text" placeholder="https://script.google.com/macros/s/YOUR_ID/exec"
+            style="flex:1;min-width:260px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none"
+            onfocus="this.style.borderColor='rgba(108,142,255,0.5)'" onblur="this.style.borderColor='var(--border)'" />
+          <button onclick="connectGAS()" style="padding:8px 18px;background:rgba(108,142,255,0.15);color:var(--indigo);border:1px solid rgba(108,142,255,0.35);border-radius:8px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.15s"
+            onmouseover="this.style.background='rgba(108,142,255,0.25)'" onmouseout="this.style.background='rgba(108,142,255,0.15)'">Connect</button>
+          <button onclick="pushAllToSheet()" style="padding:8px 18px;background:rgba(45,212,191,0.12);color:#2DD4BF;border:1px solid rgba(45,212,191,0.3);border-radius:8px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.15s"
+            onmouseover="this.style.background='rgba(45,212,191,0.22)'" onmouseout="this.style.background='rgba(45,212,191,0.12)'">↑ Push all data to Sheet</button>
+          <button onclick="copyShareUrl()" id="copy-share-btn" style="display:none;padding:8px 18px;background:rgba(251,191,36,0.12);color:#FBBF24;border:1px solid rgba(251,191,36,0.3);border-radius:8px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.15s"
+            onmouseover="this.style.background='rgba(251,191,36,0.22)'" onmouseout="this.style.background='rgba(251,191,36,0.12)'">📋 Copy share URL</button>
+        </div>
+        <div id="setup-msg" style="font-size:11px;margin-top:8px;color:var(--text3)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── WEEKLY TRACKER ── -->
+  <div id="panel-tracker" class="panel">
+    <div class="filter-bar" id="tracker-filters"></div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table id="tracker-table">
+          <thead>
+            <tr>
+              <th style="width:40px">#</th>
+              <th style="width:36px">Wk</th>
+              <th style="min-width:260px">Task / Deliverable</th>
+              <th style="min-width:120px">Owner(s)</th>
+              <th style="width:62px">Priority</th>
+              <th style="width:56px">Days</th>
+              <th style="width:74px">Start</th>
+              <th style="width:74px">End</th>
+              <th style="width:110px">Status</th>
+              <th style="min-width:160px">Notes / Blockers</th>
+            </tr>
+          </thead>
+          <tbody id="tracker-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MILESTONES ── -->
+  <div id="panel-milestones" class="panel">
+    <div class="stat-bar" id="ms-stats"></div>
+    <div class="card" id="ms-list"></div>
+  </div>
+
+  <!-- ── GANTT ── -->
+  <div id="panel-gantt" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Gantt Chart</span>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)"><span style="width:12px;height:8px;border-radius:2px;background:#6C8EFFCC;display:inline-block"></span>Active</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)"><span style="width:12px;height:8px;border-radius:2px;background:#2DD4BF55;border:1px solid #2DD4BF99;display:inline-block"></span>Done</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)"><span style="width:12px;height:8px;border-radius:2px;background:#EF4444AA;display:inline-block"></span>Blocked</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)"><span style="width:12px;height:8px;border-radius:2px;background:#10B981AA;display:inline-block"></span>GTM</span>
+        </div>
+      </div>
+      <!-- Controls bar -->
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 0 14px;border-bottom:1px solid var(--border);margin-bottom:14px;">
+        <!-- View toggle -->
+        <div style="display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;flex-shrink:0;">
+          <button id="gantt-view-all" onclick="setGanttView('all')" style="padding:6px 14px;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:var(--indigo);color:#fff;transition:all 0.15s;">All Weeks</button>
+          <button id="gantt-view-week" onclick="setGanttView('week')" style="padding:6px 14px;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all 0.15s;">Week View</button>
+        </div>
+        <!-- Week navigator (shown in Week View mode) -->
+        <div id="gantt-week-nav" style="display:none;align-items:center;gap:6px;">
+          <button onclick="shiftGanttWeek(-1)" style="padding:5px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:14px;cursor:pointer;line-height:1;">&#9664;</button>
+          <span id="gantt-week-label" style="font-size:11px;font-weight:700;color:var(--text2);min-width:175px;text-align:center;"></span>
+          <button onclick="shiftGanttWeek(1)" style="padding:5px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:14px;cursor:pointer;line-height:1;">&#9654;</button>
+        </div>
+        <div style="width:1px;height:26px;background:var(--border);flex-shrink:0;"></div>
+        <!-- Date range filter -->
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="font-size:11px;color:var(--text3);font-weight:600;">Range:</span>
+          <select id="gantt-from-week" onchange="buildGantt()" style="padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;"></select>
+          <span style="font-size:11px;color:var(--text3);">to</span>
+          <select id="gantt-to-week" onchange="buildGantt()" style="padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;"></select>
+          <button onclick="resetGanttFilter()" style="padding:5px 10px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text3);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;">Reset</button>
+        </div>
+        <div style="width:1px;height:26px;background:var(--border);flex-shrink:0;"></div>
+        <!-- Phase filter -->
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:11px;color:var(--text3);font-weight:600;">Phase:</span>
+          <select id="gantt-phase-filter" onchange="buildGantt()" style="padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;">
+            <option value="all">All Phases</option>
+            <option value="1">Phase 1</option><option value="2">Phase 2</option>
+            <option value="3">Phase 3</option><option value="4">Phase 4</option>
+            <option value="5">Phase 5</option><option value="6">Phase 6</option>
+            <option value="7">Phase 7</option>
+          </select>
+        </div>
+        <!-- Jump to today -->
+        <button onclick="jumpToToday()" style="padding:6px 12px;background:rgba(108,142,255,0.12);border:1px solid rgba(108,142,255,0.3);border-radius:6px;color:var(--indigo);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:auto;flex-shrink:0;">&#9679; Today</button>
+      </div>
+      <div class="gantt-wrap" style="overflow-x:auto;">
+        <table class="gantt-table" id="gantt-table" style="border-collapse:collapse;font-size:11px;width:100%;"></table>
+      </div>
+    </div>
+  </div>
+  <!-- ── WORKLOAD ── -->
+  <div id="panel-workload" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Team Workload by Week</span>
+        <div style="display:flex;gap:8px;font-size:10px;font-weight:700;">
+          <span class="badge badge-green">1–2 tasks</span>
+          <span class="badge badge-blue">3–4 tasks</span>
+          <span class="badge badge-amber">5–6 tasks</span>
+          <span class="badge badge-red">7+ tasks</span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table id="workload-table">
+          <thead>
+            <tr id="workload-head"></tr>
+          </thead>
+          <tbody id="workload-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GTM ── -->
+  <div id="panel-gtm" class="panel">
+    <div id="gtm-content"></div>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════
+
+const TEAM = [
+  { name: 'Amrut',    role: 'Sales & Business Dev (GTM)', color: '#10B981' },
+  { name: 'Nikunj',   role: 'Sales Support',              color: '#8B5CF6' },
+  { name: 'Rani',     role: 'ROS-2 Software Dev',         color: '#0EA5E9' },
+  { name: 'Faizan',   role: 'ROS-2 Software Dev',         color: '#F59E0B' },
+  { name: 'Ashutosh', role: 'Hardware System Design',    color: '#EC4899' },
+  { name: 'Intern 1', role: 'Software Dev Support',       color: '#14B8A6' },
+  { name: 'Intern 2', role: 'Software Dev Support',       color: '#F97316' },
+];
+
+const PHASES = [
+  { num:1, name:'Infrastructure & Architecture',       weeks:'W1–W2',   dur:'2 wks', deliverable:'ROS2 infra + config/logging/lifecycle + sim env ready',                       color:'#4F46E5', owners:['Rani','Faizan','Ashutosh','Intern 1','Intern 2'] },
+  { num:2, name:'Vendor Adapters (Simulation Stubs)',  weeks:'W3–W4',   dur:'2 wks', deliverable:'All vendor adapter stubs in sim; AMR, cobot, sensors',                        color:'#0EA5E9', owners:['Rani','Faizan','Ashutosh','Amrut','Nikunj','Intern 1','Intern 2'] },
+  { num:3, name:'Calibration & Scene Perception',      weeks:'W5–W6',   dur:'2 wks', deliverable:'Container geometry detection + sensor fusion + localization',                  color:'#10B981', owners:['Rani','Faizan','Ashutosh','Amrut','Nikunj','Intern 1','Intern 2'] },
+  { num:4, name:'Carton Perception & World Model',     weeks:'W7–W10',  dur:'4 wks', deliverable:'Carton detection, pose, tracking, world model in sim',                         color:'#F59E0B', owners:['Rani','Faizan','Ashutosh','Amrut','Nikunj','Intern 1','Intern 2'] },
+  { num:5, name:'Motion Control & AMR Navigation',     weeks:'W7–W10',  dur:'4 wks', deliverable:'AMR ingress/egress control + safety + fault systems',                         color:'#EC4899', owners:['Rani','Faizan','Intern 1','Intern 2'] },
+  { num:6, name:'Planning, Manipulation & Grasping',   weeks:'W9–W12',  dur:'4 wks', deliverable:'Grasp generation + MoveIt2 planning + unloading sequencer',                   color:'#8B5CF6', owners:['Rani','Faizan','Ashutosh','Amrut','Nikunj','Intern 1','Intern 2'] },
+  { num:7, name:'System Integration & Sim Validation', weeks:'W11–W18', dur:'8 wks', deliverable:'Full E2E sim validation + demo video + GTM deck',                             color:'#14B8A6', owners:['Rani','Faizan','Ashutosh','Amrut','Nikunj','Intern 1','Intern 2'] },
+];
+
+const PHASE_WEEK_RANGES = [
+  [1,2],[3,4],[5,6],[7,10],[7,10],[9,12],[11,18]
+];
+
+const STATUS_LIST = ['Not Started','In Progress','Done','Blocked'];
+
+// Weekly tracker tasks
+const TASKS = [
+  // Phase 1
+  { phase:1, week:'W1', task:'Setup ROS2 workspace, Docker, CI/CD pipeline', owners:["Rani"], priority:'High', days:1, start:'09 Mar', end:'20 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W1', task:'Config Loader / Validator (Pydantic + YAML)', owners:["Rani"], priority:'Med', days:1, start:'09 Mar', end:'13 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W1', task:'Logging framework (ROS2 bag + loguru)', owners:["Faizan"], priority:'Med', days:1, start:'09 Mar', end:'13 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W1', task:'Time Sync Manager (chrony/PTP)', owners:["Rani"], priority:'Med', days:1, start:'09 Mar', end:'13 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W2', task:'System Lifecycle Manager (ROS2 lifecycle nodes)', owners:["Faizan"], priority:'Med', days:1, start:'16 Mar', end:'20 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W2', task:'Process / Node Supervisor (psutil + watchdog)', owners:["Rani"], priority:'Med', days:1, start:'16 Mar', end:'20 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W2', task:'Startup / Shutdown Orchestrator (asyncio)', owners:["Faizan"], priority:'Med', days:1, start:'16 Mar', end:'20 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W2', task:'Resource Manager (cgroups)', owners:["Intern 1"], priority:'Med', days:1, start:'16 Mar', end:'20 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W1', task:'Architecture diagrams & interface spec docs', owners:["Ashutosh", "Rani", "Faizan"], priority:'High', days:1, start:'09 Mar', end:'20 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W1', task:'Simulation environment setup (Gazebo/Isaac Sim)', owners:["Ashutosh"], priority:'Med', days:1, start:'09 Mar', end:'20 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W1', task:'Intern onboarding & dev environment setup', owners:["Intern 1", "Intern 2"], priority:'Med', days:1, start:'09 Mar', end:'13 Mar', status:'Not Started', notes:'' },
+  { phase:1, week:'W1', task:'GTM: market research, customer discovery interviews', owners:["Amrut", "Nikunj"], priority:'Med', days:1, start:'09 Mar', end:'20 Mar', status:'Not Started', notes:'' },
+  // Phase 2
+  { phase:2, week:'W3', task:'AMR Base Control Interface (sim stub)', owners:["Rani"], priority:'High', days:1, start:'23 Mar', end:'27 Mar', status:'Not Started', notes:'' },
+  { phase:2, week:'W3', task:'Velocity Command Interface (rate limiter)', owners:["Faizan"], priority:'Med', days:1, start:'23 Mar', end:'27 Mar', status:'Not Started', notes:'' },
+  { phase:2, week:'W3', task:'Cartesian Motion Interface (cobot sim stub)', owners:["Rani"], priority:'High', days:1, start:'23 Mar', end:'03 Apr', status:'Not Started', notes:'' },
+  { phase:2, week:'W3', task:'Joint Control Interface (sim stub)', owners:["Faizan"], priority:'Med', days:1, start:'23 Mar', end:'27 Mar', status:'Not Started', notes:'' },
+  { phase:2, week:'W3', task:'Robot State Feedback Interface (sim stub)', owners:["Intern 1"], priority:'Med', days:1, start:'23 Mar', end:'27 Mar', status:'Not Started', notes:'' },
+  { phase:2, week:'W4', task:'LiDAR Vendor Adapter (Ouster/Velodyne driver sim)', owners:["Rani"], priority:'Med', days:1, start:'30 Mar', end:'03 Apr', status:'Not Started', notes:'' },
+  { phase:2, week:'W4', task:'Camera / Depth Vendor Adapter (RealSense/ZED sim)', owners:["Faizan"], priority:'Med', days:1, start:'30 Mar', end:'03 Apr', status:'Not Started', notes:'' },
+  { phase:2, week:'W4', task:'Conveyor Start/Stop + Speed Control (PLC stub)', owners:["Intern 2"], priority:'Med', days:1, start:'30 Mar', end:'03 Apr', status:'Not Started', notes:'' },
+  { phase:2, week:'W4', task:'Safety Sensor Adapter (stub)', owners:["Intern 1"], priority:'Med', days:1, start:'30 Mar', end:'03 Apr', status:'Not Started', notes:'' },
+  { phase:2, week:'W3', task:'3D model: AMR + cobot URDF in Gazebo', owners:["Ashutosh"], priority:'Med', days:1, start:'23 Mar', end:'03 Apr', status:'Not Started', notes:'' },
+  { phase:2, week:'W3', task:'3D model: Container + conveyor in sim', owners:["Ashutosh"], priority:'Med', days:1, start:'23 Mar', end:'03 Apr', status:'Not Started', notes:'' },
+  { phase:2, week:'W3', task:'GTM: competitor analysis, pricing model draft', owners:["Amrut", "Nikunj"], priority:'Med', days:1, start:'23 Mar', end:'03 Apr', status:'Not Started', notes:'' },
+  // Phase 3
+  { phase:3, week:'W5', task:'Container Boundary Detection (RANSAC, PCL/Open3D)', owners:["Rani"], priority:'High', days:1, start:'06 Apr', end:'10 Apr', status:'Not Started', notes:'' },
+  { phase:3, week:'W5', task:'Container Wall Proximity Monitor (nearest-point)', owners:["Faizan"], priority:'Med', days:1, start:'06 Apr', end:'10 Apr', status:'Not Started', notes:'' },
+  { phase:3, week:'W5', task:'Container Alignment Verifier (aperture matching)', owners:["Rani"], priority:'Med', days:1, start:'06 Apr', end:'17 Apr', status:'Not Started', notes:'' },
+  { phase:3, week:'W5', task:'Robot Localization – Relative (EKF, robot_localization)', owners:["Faizan"], priority:'Med', days:1, start:'06 Apr', end:'10 Apr', status:'Not Started', notes:'' },
+  { phase:3, week:'W6', task:'Sensor Fusion Manager (voxel grid / ICP, Open3D)', owners:["Rani"], priority:'High', days:1, start:'13 Apr', end:'17 Apr', status:'Not Started', notes:'' },
+  { phase:3, week:'W6', task:'Stack Proximity Detector (forward LiDAR threshold)', owners:["Intern 1"], priority:'Med', days:1, start:'13 Apr', end:'17 Apr', status:'Not Started', notes:'' },
+  { phase:3, week:'W6', task:'End-of-Container Detector (forward RANSAC plane)', owners:["Intern 2"], priority:'Med', days:1, start:'13 Apr', end:'17 Apr', status:'Not Started', notes:'' },
+  { phase:3, week:'W5', task:'Sim: Realistic container scene with carton stacks', owners:["Ashutosh"], priority:'Med', days:1, start:'06 Apr', end:'17 Apr', status:'Not Started', notes:'' },
+  { phase:3, week:'W6', task:'Unit tests for all perception modules', owners:["Intern 1"], priority:'Med', days:1, start:'13 Apr', end:'17 Apr', status:'Not Started', notes:'' },
+  { phase:3, week:'W5', task:'GTM: pilot customer identification, deck v1', owners:["Amrut", "Nikunj"], priority:'Med', days:1, start:'06 Apr', end:'17 Apr', status:'Not Started', notes:'' },
+  // Phase 4
+  { phase:4, week:'W7', task:'Carton Detection – dataset prep + YOLOv8 training', owners:["Rani"], priority:'High', days:1, start:'20 Apr', end:'01 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W8', task:'Carton Detection – integration + ROS2 publisher', owners:["Rani"], priority:'High', days:1, start:'27 Apr', end:'01 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W7', task:'Carton Segmentation (SAM2 / Mask R-CNN)', owners:["Faizan"], priority:'Med', days:1, start:'20 Apr', end:'01 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W8', task:'Carton Dimension Estimation (depth projection)', owners:["Intern 1"], priority:'Med', days:1, start:'27 Apr', end:'08 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W9', task:'Carton Pose Estimation (FoundPose / PointNet++)', owners:["Rani"], priority:'High', days:1, start:'04 May', end:'15 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W9', task:'Grasp Surface Quality Estimator (point normal analysis)', owners:["Faizan"], priority:'Med', days:1, start:'04 May', end:'08 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W10', task:'Pick Feasibility Estimator (IK reachability, MoveIt2)', owners:["Faizan"], priority:'Med', days:1, start:'11 May', end:'15 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W8', task:'Object Tracking (ByteTrack adapted 3D)', owners:["Intern 2"], priority:'Med', days:1, start:'27 Apr', end:'08 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W9', task:'Pile Stability Estimator (CoM heuristics)', owners:["Intern 1"], priority:'Med', days:1, start:'04 May', end:'15 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W10', task:'World Model Manager (scene graph + ROS2 pub)', owners:["Rani"], priority:'High', days:1, start:'11 May', end:'15 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W10', task:'Carton Presence Detection + Jam Detection', owners:["Intern 2"], priority:'Med', days:1, start:'11 May', end:'15 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W7', task:'Sim: Dense carton stack scenarios + ground truth data', owners:["Ashutosh"], priority:'Med', days:1, start:'20 Apr', end:'08 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W9', task:'Sim: Lighting + sensor noise variation', owners:["Ashutosh"], priority:'Med', days:1, start:'04 May', end:'15 May', status:'Not Started', notes:'' },
+  { phase:4, week:'W7', task:'GTM: sales deck v2, pilot outreach begins', owners:["Amrut", "Nikunj"], priority:'High', days:1, start:'20 Apr', end:'15 May', status:'Not Started', notes:'' },
+  // Phase 5
+  { phase:5, week:'W7', task:'Container Alignment Controller (PID)', owners:["Faizan"], priority:'High', days:1, start:'20 Apr', end:'24 Apr', status:'Not Started', notes:'' },
+  { phase:5, week:'W7', task:'Linear Ingress Controller (PID lateral + forward speed)', owners:["Rani"], priority:'High', days:1, start:'20 Apr', end:'01 May', status:'Not Started', notes:'' },
+  { phase:5, week:'W8', task:'Forward Advance Controller (odometry state machine)', owners:["Faizan"], priority:'Med', days:1, start:'27 Apr', end:'01 May', status:'Not Started', notes:'' },
+  { phase:5, week:'W9', task:'Retraction Sequence Manager', owners:["Rani"], priority:'High', days:1, start:'04 May', end:'08 May', status:'Not Started', notes:'' },
+  { phase:5, week:'W9', task:'Platform–Cobot Coordination Manager (interlock FSM)', owners:["Faizan"], priority:'High', days:1, start:'04 May', end:'15 May', status:'Not Started', notes:'' },
+  { phase:5, week:'W9', task:'Carton Transfer Timing Controller', owners:["Intern 1"], priority:'Med', days:1, start:'04 May', end:'08 May', status:'Not Started', notes:'' },
+  { phase:5, week:'W9', task:'Conveyor Synchronization Manager', owners:["Intern 2"], priority:'Med', days:1, start:'04 May', end:'08 May', status:'Not Started', notes:'' },
+  { phase:5, week:'W7', task:'Safety Zone Monitor (safety zones + scan)', owners:["Rani"], priority:'High', days:1, start:'20 Apr', end:'24 Apr', status:'Not Started', notes:'' },
+  { phase:5, week:'W8', task:'System Watchdog (heartbeat + timeout recovery)', owners:["Faizan"], priority:'High', days:1, start:'27 Apr', end:'01 May', status:'Not Started', notes:'' },
+  { phase:5, week:'W10', task:'Fault Detection & Recovery (FSM-based)', owners:["Intern 1"], priority:'Med', days:1, start:'11 May', end:'15 May', status:'Not Started', notes:'' },
+  // Phase 6
+  { phase:6, week:'W9', task:'Grasp Pose Generator (GraspNet + sim data)', owners:["Rani"], priority:'High', days:1, start:'04 May', end:'15 May', status:'Not Started', notes:'' },
+  { phase:6, week:'W10', task:'MoveIt2 Motion Planner – configuration + planning scene', owners:["Faizan"], priority:'High', days:1, start:'11 May', end:'22 May', status:'Not Started', notes:'' },
+  { phase:6, week:'W11', task:'Trajectory Optimizer (Ruckig/TOTG)', owners:["Rani"], priority:'Med', days:1, start:'18 May', end:'29 May', status:'Not Started', notes:'' },
+  { phase:6, week:'W11', task:'Gripper Controller (vacuum/2-finger sim)', owners:["Faizan"], priority:'Med', days:1, start:'18 May', end:'22 May', status:'Not Started', notes:'' },
+  { phase:6, week:'W11', task:'Unloading Sequence Planner (row-by-row logic)', owners:["Rani"], priority:'High', days:1, start:'18 May', end:'29 May', status:'Not Started', notes:'' },
+  { phase:6, week:'W10', task:'Sim: Grasp + manipulation scenarios', owners:["Ashutosh"], priority:'Med', days:1, start:'11 May', end:'22 May', status:'Not Started', notes:'' },
+  { phase:6, week:'W11', task:'GTM: VC/investor deck v1 + pilot agreement template', owners:["Amrut"], priority:'High', days:1, start:'18 May', end:'29 May', status:'Not Started', notes:'' },
+  // Phase 7
+  { phase:7, week:'W11', task:'Mission FSM – full unloading mission orchestration', owners:["Rani"], priority:'High', days:1, start:'18 May', end:'29 May', status:'Not Started', notes:'' },
+  { phase:7, week:'W12', task:'Task Dispatcher (priority queue + load balance)', owners:["Faizan"], priority:'Med', days:1, start:'25 May', end:'05 Jun', status:'Not Started', notes:'' },
+  { phase:7, week:'W13', task:'Performance Profiler (latency dashboard)', owners:["Intern 1"], priority:'Med', days:1, start:'01 Jun', end:'12 Jun', status:'Not Started', notes:'' },
+  { phase:7, week:'W13', task:'Throughput Measurement (cartons/min benchmark)', owners:["Rani"], priority:'High', days:1, start:'01 Jun', end:'12 Jun', status:'Not Started', notes:'' },
+  { phase:7, week:'W14', task:'E2E Integration Test Suite (50+ scenarios)', owners:["Faizan", "Intern 1", "Intern 2"], priority:'High', days:1, start:'08 Jun', end:'26 Jun', status:'Not Started', notes:'' },
+  { phase:7, week:'W16', task:'Throughput optimisation: target ≥6 cartons/min', owners:["Rani", "Faizan"], priority:'High', days:1, start:'22 Jun', end:'03 Jul', status:'Not Started', notes:'' },
+  { phase:7, week:'W17', task:'Demo video production (3-min E2E sim demo)', owners:["Ashutosh", "Amrut"], priority:'High', days:1, start:'29 Jun', end:'10 Jul', status:'Not Started', notes:'' },
+  { phase:7, week:'W18', task:'Technical report: architecture + metrics + next steps', owners:["Rani", "Faizan"], priority:'High', days:1, start:'06 Jul', end:'10 Jul', status:'Not Started', notes:'' },
+  { phase:7, week:'W18', task:'GTM: final investor/partner pitch deck + demo', owners:["Amrut", "Nikunj"], priority:'High', days:1, start:'06 Jul', end:'10 Jul', status:'Not Started', notes:'' },
+];
+
+const MILESTONES = [
+  // Phase 1
+  { phase:1, week:'W2', date:'20 Mar 2026', milestone:'ROS2 workspace & Docker containerised environment live', owners:["Rani"], criteria:'', status:'Not Started' },
+  { phase:1, week:'W2', date:'20 Mar 2026', milestone:'Config Loader/Validator + Logging + Time Sync operational', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:1, week:'W2', date:'20 Mar 2026', milestone:'System Lifecycle Manager + Startup/Shutdown Orchestrator implemented', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:1, week:'W2', date:'20 Mar 2026', milestone:'Architecture diagrams & module interface contracts signed off', owners:["All"], criteria:'', status:'Not Started' },
+  // Phase 2
+  { phase:2, week:'W4', date:'03 Apr 2026', milestone:'AMR Base Control + Velocity Interface stubs publishing on ROS2 topics', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:2, week:'W4', date:'03 Apr 2026', milestone:'Cobot (Cartesian/Joint) interfaces + State Feedback stubs working in sim', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:2, week:'W4', date:'03 Apr 2026', milestone:'LiDAR + Depth Camera vendor adapters publishing simulated point clouds', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:2, week:'W4', date:'03 Apr 2026', milestone:'Conveyor Start/Stop + Speed Control stubs operational', owners:["Intern 1", "Intern 2"], criteria:'', status:'Not Started' },
+  // Phase 3
+  { phase:3, week:'W5', date:'10 Apr 2026', milestone:'Container Boundary Detection (RANSAC) working on sim point clouds', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:3, week:'W6', date:'17 Apr 2026', milestone:'Container Alignment Verifier + Wall Proximity Monitor validated in sim', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:3, week:'W5', date:'10 Apr 2026', milestone:'EKF Robot Localization fusing odometry + IMU', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:3, week:'W6', date:'17 Apr 2026', milestone:'Sensor Fusion Manager (LiDAR + depth) producing unified 3D scene', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  // Phase 4
+  { phase:4, week:'W8', date:'01 May 2026', milestone:'YOLOv8/RT-DETR carton detection running on sim RGB-D at >30 FPS', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:4, week:'W9', date:'08 May 2026', milestone:'SAM2 segmentation producing instance masks per carton', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:4, week:'W10', date:'15 May 2026', milestone:'Carton Pose Estimation (FoundPose/PointNet++) returning 6-DoF poses', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:4, week:'W9', date:'08 May 2026', milestone:'Object Tracking (ByteTrack 3D) with persistent IDs across frames', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:4, week:'W10', date:'15 May 2026', milestone:'World Model Manager with persistent carton registry live', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  // Phase 5
+  { phase:5, week:'W8', date:'01 May 2026', milestone:'Linear Ingress Controller (PID lateral) navigating container in sim', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:5, week:'W10', date:'15 May 2026', milestone:'Platform–Cobot Coordination (interlock FSM) preventing collisions', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:5, week:'W9', date:'08 May 2026', milestone:'Retraction Sequence Manager fully validated in simulation', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:5, week:'W8', date:'01 May 2026', milestone:'Safety Zone Monitor + System Watchdog operational', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  // Phase 6
+  { phase:6, week:'W10', date:'15 May 2026', milestone:'Grasp Pose Generator (GraspNet) producing ranked candidates in sim', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:6, week:'W12', date:'29 May 2026', milestone:'MoveIt2 motion planner executing collision-free trajectories', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:6, week:'W12', date:'29 May 2026', milestone:'Trajectory Optimizer (Ruckig/TOTG) producing smooth joint paths', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:6, week:'W12', date:'29 May 2026', milestone:'Unloading Sequence Planner completing full simulated container', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  // Phase 7
+  { phase:7, week:'W12', date:'29 May 2026', milestone:'Full E2E unloading mission running in simulation (docking → exit)', owners:["Rani", "Faizan", "Ashutosh"], criteria:'', status:'Not Started' },
+  { phase:7, week:'W12', date:'29 May 2026', milestone:'Mission FSM + Task Dispatcher orchestrating all subsystems', owners:["Rani"], criteria:'', status:'Not Started' },
+  { phase:7, week:'W16', date:'26 Jun 2026', milestone:'Throughput target: ≥6 cartons/min in simulation', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
+  { phase:7, week:'W18', date:'10 Jul 2026', milestone:'90-day deliverable: Demo-ready simulation video + technical report', owners:["All"], criteria:'', status:'Not Started' },
+];
+
+const WORKLOAD = [
+  { member:'Amrut', role:'Sales & Business Dev (GTM)', weeks:[1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2] },
+  { member:'Nikunj', role:'Sales Support', weeks:[1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1] },
+  { member:'Rani', role:'ROS-2 Software Development', weeks:[4, 3, 2, 2, 2, 2, 2, 3, 4, 5, 3, 3, 2, 2, 1, 2, 1, 1] },
+  { member:'Faizan', role:'ROS-2 Software Development', weeks:[3, 4, 2, 1, 2, 0, 2, 2, 3, 4, 1, 2, 2, 2, 1, 2, 1, 1] },
+  { member:'Ashutosh', role:'Hardware / 3D Modelling (Sim)', weeks:[2, 2, 2, 2, 1, 1, 1, 1, 3, 2, 1, 0, 1, 1, 1, 1, 0, 1] },
+  { member:'Intern 1', role:'Software Dev Support', weeks:[1, 1, 1, 1, 0, 2, 0, 2, 3, 3, 0, 1, 0, 0, 1, 1, 0, 1] },
+  { member:'Intern 2', role:'Software Dev Support', weeks:[1, 0, 0, 1, 0, 1, 0, 2, 2, 2, 1, 1, 0, 0, 1, 1, 1, 1] },
+];
+
+const GTM_DATA = {
+  note: 'Panama deal (W1 gate) · Chennai = hardware provider only (AMR/cobot/sensors) · AutoDock owns all software · Amrut: MOU · Nikunj: sync cadence · No cold outreach in 90 days',
+  tracks: [
+    {
+      title: 'TRACK 1 — Panama Deal Support(Active — W1)',
+      color: '#10B981',
+      note: 'CEO meeting this week/next. Amrut owns prep. Clarity on deal expected end of W1.',
+      tasks: [
+        { weeks:'W1', task:'CEO meeting brief: 1-pager on AutoDock capability + sim roadmap', owner:'Amrut', deliverable:'1-pager PDF + capability summary', status:'In Progress', notes:'CEO meeting this week/next' },
+        { weeks:'W1', task:'Sim milestone timeline — demo-ready at W6, W12, W18', owner:'Amrut, Nikunj', deliverable:'Milestone timeline doc shareable with Panama lead', status:'Not Started', notes:'Rani/Faizan confirm dates' },
+        { weeks:'W1', task:'Post-meeting follow-up: technical Q&A if requested', owner:'Amrut', deliverable:'Follow-up response doc (if needed)', status:'Not Started', notes:'Reactive only' },
+        { weeks:'W1', task:'⭐ Go / No-Go decision on Chennai co-dev track', owner:'Amrut + CEO', deliverable:'Clear written decision — activates or closes Track 2', status:'Not Started', notes:'Gate. Expected end of W1.' },
+      ]
+    },
+    {
+      title: 'TRACK 2 — Chennai Hardware Partnership(CONDITIONAL — unlocks at W1 gate)',
+      color: '#F59E0B',
+      note: 'Chennai = hardware provider only (AMR, cobot, sensors). AutoDock owns 100% software. Clean IP split. MOU covers HW delivery spec + SLAs only.',
+      tasks: [
+        { weeks:'W2', task:'Intro call: AutoDock context, sim roadmap, hardware requirements overview', owner:'Amrut, Nikunj', deliverable:'Intro call notes + Chennai HW capability confirmed', status:'Blocked', notes:'Can start W2 if W1 gate clears' },
+        { weeks:'W2–W3', task:'Define hardware delivery spec: AMR platform, cobot model, sensor suite', owner:'Amrut + Rani', deliverable:'Hardware requirements doc (input for MOU)', status:'Blocked', notes:'Rani/Faizan provide sensor/cobot specs' },
+        { weeks:'W3–W4', task:'MOU drafting: HW delivery milestones, sensor integration SLAs, IP ownership', owner:'Amrut (+ legal)', deliverable:'MOU v1 draft', status:'Blocked', notes:'Scope: HW delivery + IP only. Keep tight.' },
+        { weeks:'W4', task:'⭐ MOU review + sign-off with Chennai partner', owner:'Amrut', deliverable:'Signed MOU / partnership agreement', status:'Blocked', notes:'Key Amrut deliverable' },
+        { weeks:'W4–W5', task:'Agree sync cadence: bi-weekly 30-min check-in on hardware readiness', owner:'Amrut, Nikunj', deliverable:'Recurring calendar + shared HW tracking doc', status:'Blocked', notes:'Nikunj owns cadence from W5' },
+        { weeks:'W5–W18', task:'Bi-weekly hardware readiness sync with Chennai engineering team', owner:'Nikunj', deliverable:'Running notes log — HW delivery vs sim milestones', status:'Blocked', notes:'Escalate slippage risks to Amrut' },
+        { weeks:'W12', task:'Mid-point: is Chennai HW on track for post-90-day integration?', owner:'Amrut', deliverable:'Risk flag if HW timeline slipping', status:'Blocked', notes:'Ties to Phase 7 sim completion' },
+        { weeks:'W17–W18', task:'Share final sim demo + W18 report with Chennai — align on HW integration plan', owner:'Amrut, Nikunj', deliverable:'Chennai aligned on capability + post-90-day HW plan', status:'Blocked', notes:'Sets up hardware testing phase' },
+      ]
+    },
+    {
+      title: 'TRACK 3 — Fallback (if Panama does NOT close at W1)',
+      color: '#94A3B8',
+      note: 'Only activated if W1 gate returns No-Go. Nikunj pivot to sim assets is low-regret regardless.',
+      tasks: [
+        { weeks:'W2+', task:'Nikunj: pivot to sim documentation + demo asset creation', owner:'Nikunj', deliverable:'Sim explainer docs, screenshot library, architecture 1-pager', status:'Conditional', notes:'Low-regret — valuable regardless' },
+        { weeks:'W2+', task:'Amrut: reassess GTM — define next 2–3 target verticals and approach', owner:'Amrut', deliverable:'GTM strategy v1 doc', status:'Conditional', notes:'Only if Panama fails' },
+        { weeks:'W3+', task:'Identify 3 alternative pilot candidates (port operators, 3PLs)', owner:'Amrut', deliverable:'Qualified shortlist with contacts', status:'Conditional', notes:'Only if Panama fails' },
+      ]
+    },
+  ]
+};
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+
+function ownerColor(name) {
+  const t = TEAM.find(x => x.name === name);
+  return t ? t.color : '#94A3B8';
+}
+
+function ownerTag(name) {
+  const c = ownerColor(name);
+  return `<span class="owner-tag" style="background:${c}1A;color:${c};border-color:${c}33"><span class="owner-dot" style="background:${c}"></span>${name}</span>`;
+}
+
+function statusClass(s) {
+  if (!s) return 's-not-started';
+  const m = {'Not Started':'s-not-started','In Progress':'s-in-progress','Done':'s-done','Blocked':'s-blocked','Conditional':'s-conditional'};
+  return m[s] || 's-not-started';
+}
+
+function statusColors(s) {
+  if (s==='In Progress') return { bg:'rgba(56,189,248,0.15)', col:'#38BDF8' };
+  if (s==='Done')        return { bg:'rgba(45,212,191,0.15)', col:'#2DD4BF' };
+  if (s==='Blocked')     return { bg:'rgba(248,113,113,0.15)', col:'#F87171' };
+  if (s==='Conditional') return { bg:'rgba(251,191,36,0.15)', col:'#FBBF24' };
+  return { bg:'rgba(90,122,158,0.15)', col:'#5A7A9E' };
+}
+
+function statusOptions(current) {
+  const sc = statusClass(current);
+  let bg='#F1F5F9', col='#475569';
+  if(sc==='s-in-progress'){bg='#DBEAFE';col='#1E40AF';}
+  else if(sc==='s-done'){bg='#D1FAE5';col='#065F46';}
+  else if(sc==='s-blocked'){bg='#FEE2E2';col='#991B1B';}
+  else if(sc==='s-conditional'){bg='#FEF3C7';col='#92400E';}
+  const opts = STATUS_LIST.map(s => `<option value="${s}"${s===current?' selected':''}>${s}</option>`).join('');
+  return `<select class="status-select" style="background:${bg};color:${col}" onchange="updateStatus(this)">${opts}</select>`;
+}
+
+function prioClass(p) { return p==='High'?'p-high':p==='Low'?'p-low':'p-med'; }
+function phaseColor(n) { return PHASES.find(p=>p.num===n)?.color||'#64748B'; }
+
+function updateStatus(sel) {
+  const tr = sel.closest('tr');
+  const idx = +tr.dataset.idx;
+  const store = sel.dataset.store;
+  const val = sel.value;
+  if(store==='task') TASKS[idx].status = val;
+  else if(store==='milestone') MILESTONES[idx].status = val;
+  else if(store==='gtm') {
+    const ti = +sel.dataset.track;
+    const gi = +sel.dataset.gidx;
+    GTM_DATA.tracks[ti].tasks[gi].status = val;
+  }
+  const {bg, col} = statusColors(val);
+  sel.style.background = bg; sel.style.color = col;
+  updateHeaderStats();
+}
+
+function saveNotes(inp) {
+  const idx = +inp.dataset.idx;
+  TASKS[idx].notes = inp.value;
+}
+
+// ══════════════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════════════
+
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// HEADER STATS
+// ══════════════════════════════════════════════════════
+
+function updateHeaderStats() {
+  var total   = TASKS.length;
+  var done    = TASKS.filter(function(t){ return t.status === 'Done'; }).length;
+  var inProg  = TASKS.filter(function(t){ return t.status === 'In Progress'; }).length;
+  var blocked = TASKS.filter(function(t){ return t.status === 'Blocked'; }).length;
+  var pct     = total ? Math.round(done / total * 100) : 0;
+  var MO  = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function parseD(s) {
+    if (!s || s === 'undefined') return null;
+    s = s.trim();
+    // Format A: "09 Mar" or "09 Mar 2026" — normal tracker format
+    var p = s.split(' ');
+    if (p.length >= 2 && p[1] in MO)
+      return new Date(p.length >= 3 ? parseInt(p[2]) : 2026, MO[p[1]], parseInt(p[0]));
+    // Format B: raw GAS / JS Date string e.g. "Mon Mar 09 2026 00:00:00 GMT+0530"
+    var d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  function fmtD(d) {
+    if (!d || isNaN(d.getTime())) return '—';
+    return d.getDate() + ' ' + MON[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  var minDate=null, maxDate=null;
+  TASKS.forEach(function(t){
+    var sd=parseD(t.start),ed=parseD(t.end);
+    if(sd&&(!minDate||sd<minDate))minDate=sd;
+    if(ed&&(!maxDate||ed>maxDate))maxDate=ed;
+  });
+  MILESTONES.forEach(function(m){
+    var md=parseD(m.date);
+    if(md&&(!maxDate||md>maxDate))maxDate=md;
+  });
+  var totalWeeks=(minDate&&maxDate)?Math.round((maxDate-minDate)/(7*24*3600*1000)):18;
+  var today=new Date();
+  var dl=maxDate?Math.ceil((maxDate-today)/86400000):null;
+  var ts=dl===null?'':dl>0?' · '+dl+'d left':' · Completed';
+  var se=document.getElementById('hdr-start');
+  var ee=document.getElementById('hdr-end');
+  var we=document.getElementById('hdr-weeks');
+  var pe=document.getElementById('hdr-progress');
+  if(se)se.textContent='Start: '+fmtD(minDate);
+  if(ee)ee.textContent='End: '+fmtD(maxDate);
+  if(we)we.textContent=totalWeeks+' Weeks'+ts;
+  if(pe){pe.textContent=pct+'% Done';pe.className='badge '+(pct===100?'badge-green':pct>0?'badge-blue':'badge-white');}
+  document.getElementById('header-stats').innerHTML=
+    '<span class="badge badge-white">'+total+' Tasks</span>'+
+    '<span class="badge badge-blue">'+inProg+' In Progress</span>'+
+    '<span class="badge badge-green">'+done+' Done</span>'+
+    '<span class="badge badge-red">'+blocked+' Blocked</span>';
+}
+
+// ══════════════════════════════════════════════════════
+// OVERVIEW
+// ══════════════════════════════════════════════════════
+
+let activeMember = null;
+
+function toggleMemberDrawer(name) {
+  const drawer = document.getElementById('member-drawer');
+  const cards = document.querySelectorAll('.team-member-card');
+
+  // Deselect all
+  cards.forEach(c => c.classList.remove('selected'));
+
+  if (activeMember === name) {
+    // Close if same member clicked again
+    activeMember = null;
+    drawer.classList.remove('open');
+    drawer.innerHTML = '';
+    return;
+  }
+
+  activeMember = name;
+
+  // Select clicked card
+  const cardEl = document.getElementById('card-' + name.replace(' ', '-'));
+  if (cardEl) cardEl.classList.add('selected');
+
+  const m = TEAM.find(t => t.name === name);
+  const myTasks = TASKS.filter(t => t.owners.includes(name));
+  const myDone = myTasks.filter(t => t.status === 'Done').length;
+  const myInProg = myTasks.filter(t => t.status === 'In Progress').length;
+  const myBlocked = myTasks.filter(t => t.status === 'Blocked').length;
+
+  let rows = '';
+  let lastPhase = null;
+  myTasks.forEach((t, i) => {
+    const globalIdx = TASKS.indexOf(t);
+    const ph = PHASES.find(p => p.num === t.phase);
+    if (t.phase !== lastPhase) {
+      lastPhase = t.phase;
+      rows += `<tr><td colspan="8" style="background:var(--surface2);font-weight:700;font-size:10px;color:var(--text3);padding:5px 10px;border-top:1px solid var(--border);letter-spacing:0.5px;text-transform:uppercase">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${ph.color};margin-right:6px;vertical-align:middle"></span>Phase ${ph.num} — ${ph.name}
+      </td></tr>`;
+    }
+    const {bg, col} = statusColors(t.status);
+    rows += `<tr style="border-bottom:1px solid var(--border2);${t.status==='Done'?'opacity:0.5':''}">
+      <td style="padding:7px 10px;font-size:10px;font-weight:700;color:var(--text4)">${t.week}</td>
+      <td style="padding:7px 10px;color:var(--text);font-size:12px;font-weight:500">${t.task}</td>
+      <td style="padding:7px 10px">${t.owners.filter(o=>o!==name).map(o=>ownerTag(o)).join('') || '<span style="color:var(--text4);font-size:11px">Solo</span>'}</td>
+      <td style="padding:7px 10px"><span class="prio ${prioClass(t.priority)}">${t.priority}</span></td>
+      <td style="padding:7px 10px;color:var(--text3);font-size:11px;white-space:nowrap">${t.start}</td>
+      <td style="padding:7px 10px;color:var(--text3);font-size:11px;white-space:nowrap">${t.end}</td>
+      <td style="padding:7px 10px">
+        <select class="status-select" style="background:${bg};color:${col}" data-store="task" data-idx="${globalIdx}" onchange="updateStatus(this);rebuildDrawerStats('${name}')">
+          ${STATUS_LIST.map(s=>`<option value="${s}"${s===t.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td style="padding:7px 10px;font-size:11px;font-style:italic;color:${t.notes ? '#FBBF24' : 'var(--text4)'}">${t.notes||'—'}</td>
+    </tr>`;
+  });
+
+  drawer.innerHTML = `
+    <div class="drawer-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:50%;background:${m.color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;box-shadow:0 0 16px ${m.color}55">${m.name[0]}</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${m.name} <span style="font-size:12px;color:var(--text3);font-weight:400">— ${m.role}</span></div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <span class="badge badge-white">${myTasks.length} tasks</span>
+            <span class="badge badge-blue">${myInProg} in progress</span>
+            <span class="badge badge-green">${myDone} done</span>
+            ${myBlocked>0?`<span class="badge badge-red">${myBlocked} blocked</span>`:''}
+          </div>
+        </div>
+      </div>
+      <button class="drawer-close" onclick="toggleMemberDrawer('${name}')">✕</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+        <thead>
+          <tr style="background:var(--surface2)">
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)">Wk</th>
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);min-width:220px">Task</th>
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)">Co-owners</th>
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)">Priority</th>
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)">Start</th>
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)">End</th>
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)">Status</th>
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)">Notes</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+  drawer.classList.add('open');
+  // Scroll drawer into view
+  setTimeout(() => drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+}
+
+function rebuildDrawerStats(name) {
+  if (activeMember === name) {
+    activeMember = null; // reset so toggle reopens
+    buildOverview();
+    toggleMemberDrawer(name);
+  }
+}
+
+function buildOverview() {
+  // Stats
+  const total = TASKS.length;
+  const done = TASKS.filter(t=>t.status==='Done').length;
+  const inProg = TASKS.filter(t=>t.status==='In Progress').length;
+  const blocked = TASKS.filter(t=>t.status==='Blocked').length;
+  const ms_total = MILESTONES.length;
+  const ms_done = MILESTONES.filter(m=>m.status==='Done').length;
+
+  document.getElementById('ov-stats').innerHTML = `
+    <div class="stat-card" style="border-top-color:#6C8EFF"><div class="stat-num" style="color:#6C8EFF">${total}</div><div class="stat-label">Total Tasks</div></div>
+    <div class="stat-card" style="border-top-color:#38BDF8"><div class="stat-num" style="color:#38BDF8">${inProg}</div><div class="stat-label">In Progress</div></div>
+    <div class="stat-card" style="border-top-color:#2DD4BF"><div class="stat-num" style="color:#2DD4BF">${done}</div><div class="stat-label">Done</div></div>
+    <div class="stat-card" style="border-top-color:#F87171"><div class="stat-num" style="color:#F87171">${blocked}</div><div class="stat-label">Blocked</div></div>
+    <div class="stat-card" style="border-top-color:#FBBF24"><div class="stat-num" style="color:#FBBF24">${ms_done}/${ms_total}</div><div class="stat-label">Milestones</div></div>
+    <div class="stat-card" style="border-top-color:#A78BFA"><div class="stat-num" style="color:#A78BFA">7</div><div class="stat-label">Phases</div></div>
+  `;
+
+  // Team clickable cards
+  document.getElementById('ov-team').innerHTML = TEAM.map(m => {
+    const myTasks = TASKS.filter(t => t.owners.includes(m.name));
+    const myDone = myTasks.filter(t => t.status === 'Done').length;
+    const myBlocked = myTasks.filter(t => t.status === 'Blocked').length;
+    return `<div class="team-member-card" style="--member-color:${m.color}" onclick="toggleMemberDrawer('${m.name}')" id="card-${m.name.replace(' ','-')}">
+      <div class="tm-avatar" style="background:${m.color};box-shadow:0 0 16px ${m.color}44">${m.name[0]}</div>
+      <div>
+        <div class="tm-name">${m.name}</div>
+        <div class="tm-role">${m.role}</div>
+        <div class="tm-stats" style="color:${m.color}">${myTasks.length} tasks · ${myDone} done${myBlocked>0?' · <span style="color:#F87171">'+myBlocked+' blocked</span>':''}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Phase cards
+  document.getElementById('ov-phases').innerHTML = PHASES.map(p=>`
+    <div class="phase-card" style="border-left-color:${p.color}">
+      <div class="pc-head">
+        <div class="pc-num">Phase ${p.num}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="pc-weeks">${p.weeks}</span>
+          <span class="pc-weeks">${p.dur}</span>
+        </div>
+      </div>
+      <div class="pc-title">${p.name}</div>
+      <div class="pc-deliverable">${p.deliverable}</div>
+      <div class="pc-owners">${p.owners.map(o=>ownerTag(o)).join('')}</div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// TRACKER
+// ══════════════════════════════════════════════════════
+
+let trackerFilter = 'All';
+
+function buildTrackerFilters() {
+  const owners = ['All', ...TEAM.map(t=>t.name)];
+  document.getElementById('tracker-filters').innerHTML = owners.map(o=>`
+    <button class="filter-btn${o===trackerFilter?' active':''}" onclick="setTrackerFilter('${o}')">
+      ${o!=='All'?`<span style="width:8px;height:8px;border-radius:50%;background:${ownerColor(o)};display:inline-block"></span>`:''}
+      ${o}
+    </button>
+  `).join('');
+}
+
+function setTrackerFilter(name) {
+  trackerFilter = name;
+  buildTrackerFilters();
+  buildTracker();
+}
+
+function buildTracker() {
+  const filtered = trackerFilter==='All' ? TASKS : TASKS.filter(t=>t.owners.includes(trackerFilter));
+  let html = '', lastPhase = null, rowNum = 0;
+  filtered.forEach((t, i) => {
+    const globalIdx = TASKS.indexOf(t);
+    if(t.phase !== lastPhase) {
+      lastPhase = t.phase;
+      const ph = PHASES.find(p=>p.num===t.phase);
+      html += `<tr class="phase-row"><td colspan="10" style="border-left:4px solid ${ph.color}">▌ Phase ${ph.num} — ${ph.name}</td></tr>`;
+    }
+    rowNum++;
+    const {bg, col} = statusColors(t.status);
+    html += `<tr data-idx="${globalIdx}" style="${t.status==='Done'?'opacity:0.55':''}">
+      <td style="text-align:center;color:var(--text4);font-size:11px;font-weight:600">${rowNum}</td>
+      <td style="font-size:11px;font-weight:700;color:var(--text4)">${t.week}</td>
+      <td style="font-weight:500;color:var(--text)">${t.task}${t.status==='Done'?'<span style="margin-left:6px;font-size:10px;color:#10B981">✓</span>':''}</td>
+      <td>${t.owners.map(o=>ownerTag(o)).join('')}</td>
+      <td><span class="prio ${prioClass(t.priority)}">${t.priority}</span></td>
+      <td style="text-align:center;color:var(--text3);font-size:12px">${t.days}d</td>
+      <td style="color:var(--text3);font-size:12px;white-space:nowrap">${t.start}</td>
+      <td style="color:var(--text3);font-size:12px;white-space:nowrap">${t.end}</td>
+      <td>
+        <select class="status-select" style="background:${bg};color:${col}" data-store="task" data-idx="${globalIdx}" onchange="updateStatus(this)">
+          ${STATUS_LIST.map(s=>`<option value="${s}"${s===t.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="notes-input" value="${t.notes||''}" placeholder="Add notes..." data-idx="${globalIdx}" onchange="saveNotes(this)" /></td>
+    </tr>`;
+  });
+  document.getElementById('tracker-body').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════
+// MILESTONES
+// ══════════════════════════════════════════════════════
+
+function buildMilestones() {
+  const total = MILESTONES.length;
+  const done = MILESTONES.filter(m=>m.status==='Done').length;
+  const inProg = MILESTONES.filter(m=>m.status==='In Progress').length;
+  const notStarted = MILESTONES.filter(m=>m.status==='Not Started').length;
+
+  document.getElementById('ms-stats').innerHTML = `
+    <div class="stat-card" style="border-top-color:#6C8EFF"><div class="stat-num" style="color:#6C8EFF">${total}</div><div class="stat-label">Total Milestones</div></div>
+    <div class="stat-card" style="border-top-color:#2DD4BF"><div class="stat-num" style="color:#2DD4BF">${done}</div><div class="stat-label">Achieved</div></div>
+    <div class="stat-card" style="border-top-color:#38BDF8"><div class="stat-num" style="color:#38BDF8">${inProg}</div><div class="stat-label">In Progress</div></div>
+    <div class="stat-card" style="border-top-color:#5A7A9E"><div class="stat-num" style="color:#5A7A9E">${notStarted}</div><div class="stat-label">Upcoming</div></div>
+  `;
+
+  let html='', lastPhase=null;
+  MILESTONES.forEach((m,i)=>{
+    const ph = PHASES.find(p=>p.num===m.phase);
+    if(m.phase !== lastPhase) {
+      lastPhase = m.phase;
+      html += `<div class="ms-header">Phase ${ph.num} — ${ph.name}</div>`;
+    }
+    const {bg, col} = statusColors(m.status);
+    html += `<div class="milestone-item">
+      <div class="ms-dot" style="background:${ph.color}"></div>
+      <div style="flex:1">
+        <div class="ms-phase">${ph.name} · ${m.week} · ${m.date}</div>
+        <div class="ms-title">${m.milestone}</div>
+        <div class="ms-meta">${m.owners.map(o=>ownerTag(o)).join('')}</div>
+        <div class="ms-criteria">✓ ${m.criteria}</div>
+      </div>
+      <div>
+        <select class="status-select" style="background:${bg};color:${col}" data-store="milestone" data-idx="${i}" onchange="updateStatus(this)">
+          ${STATUS_LIST.map(s=>`<option value="${s}"${s===m.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>`;
+  });
+  document.getElementById('ms-list').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════
+// GANTT
+// ══════════════════════════════════════════════════════
+
+// W1 = 09 Mar 2026 — compute all 18 week start dates
+const WEEK_STARTS = (function() {
+  var starts = [];
+  var base = new Date(2026, 2, 9);
+  for (var i = 0; i < 18; i++) {
+    var d = new Date(base);
+    d.setDate(base.getDate() + i * 7);
+    starts.push(d);
+  }
+  return starts;
+})();
+
+var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function weekDates(i) {
+  var d   = WEEK_STARTS[i];
+  var end = new Date(d); end.setDate(d.getDate() + 4);
+  return {
+    start: d.getDate() + ' ' + MONTHS_SHORT[d.getMonth()],
+    end:   end.getDate() + ' ' + MONTHS_SHORT[end.getMonth()]
+  };
+}
+
+function currentWeekNum() {
+  var today = new Date();
+  for (var i = 17; i >= 0; i--) {
+    if (today >= WEEK_STARTS[i]) return i + 1;
+  }
+  return 1;
+}
+
+var ganttView       = 'all';
+var ganttWeekOffset = 0;
+var WEEK_VIEW_SIZE  = 6;
+
+function setGanttView(v) {
+  ganttView = v;
+  var btnAll  = document.getElementById('gantt-view-all');
+  var btnWeek = document.getElementById('gantt-view-week');
+  btnAll.style.background  = v==='all'  ? 'var(--indigo)' : 'transparent';
+  btnAll.style.color       = v==='all'  ? '#fff' : 'var(--text3)';
+  btnWeek.style.background = v==='week' ? 'var(--indigo)' : 'transparent';
+  btnWeek.style.color      = v==='week' ? '#fff' : 'var(--text3)';
+  document.getElementById('gantt-week-nav').style.display = v==='week' ? 'flex' : 'none';
+  if (v === 'week') {
+    var cw = currentWeekNum();
+    ganttWeekOffset = Math.max(0, Math.min(18 - WEEK_VIEW_SIZE, cw - 1));
+  }
+  buildGantt();
+}
+
+function shiftGanttWeek(dir) {
+  ganttWeekOffset = Math.max(0, Math.min(18 - WEEK_VIEW_SIZE, ganttWeekOffset + dir * WEEK_VIEW_SIZE));
+  buildGantt();
+}
+
+function jumpToToday() {
+  var cw = currentWeekNum();
+  ganttWeekOffset = Math.max(0, Math.min(18 - WEEK_VIEW_SIZE, cw - 1));
+  if (ganttView !== 'week') { setGanttView('week'); } else { buildGantt(); }
+}
+
+function resetGanttFilter() {
+  document.getElementById('gantt-from-week').value    = '1';
+  document.getElementById('gantt-to-week').value      = '18';
+  document.getElementById('gantt-phase-filter').value = 'all';
+  buildGantt();
+}
+
+function initGanttSelects() {
+  var from = document.getElementById('gantt-from-week');
+  var to   = document.getElementById('gantt-to-week');
+  if (!from || from.options.length > 0) return;
+  for (var i = 1; i <= 18; i++) {
+    var wd = weekDates(i-1);
+    from.add(new Option('W' + i + '  (' + wd.start + ')', i));
+    to.add(new Option('W' + i + '  (' + wd.end   + ')', i));
+  }
+  to.value = '18';
+}
+
+function parseTaskDate(s) {
+  if (!s || s === 'undefined') return null;
+  s = s.trim();
+  // Format A: "09 Mar" or "09 Mar 2026" — normal tracker format
+  var p = s.split(' ');
+  if (p.length >= 2) {
+    var mi = MONTHS_SHORT.indexOf(p[1]);
+    if (mi >= 0) return new Date(p.length >= 3 ? parseInt(p[2]) : 2026, mi, parseInt(p[0]));
+  }
+  // Format B: raw GAS / JS Date string fallback
+  var d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function buildGantt() {
+  initGanttSelects();
+
+  var phaseFilter = (document.getElementById('gantt-phase-filter') || {value:'all'}).value;
+  var fromW = parseInt((document.getElementById('gantt-from-week') || {value:'1'}).value);
+  var toW   = parseInt((document.getElementById('gantt-to-week')   || {value:'18'}).value);
+
+  var visFrom, visTo;
+  if (ganttView === 'week') {
+    visFrom = ganttWeekOffset + 1;
+    visTo   = Math.min(18, ganttWeekOffset + WEEK_VIEW_SIZE);
+  } else {
+    visFrom = Math.max(1, fromW || 1);
+    visTo   = Math.min(18, toW  || 18);
+  }
+  if (visFrom > visTo) visTo = visFrom;
+
+  var visWeeks = [];
+  for (var wi = visFrom; wi <= visTo; wi++) visWeeks.push(wi);
+
+  var CW = currentWeekNum();
+
+  // Update week-view nav label
+  if (ganttView === 'week') {
+    var fl = weekDates(visFrom-1), tl = weekDates(visTo-1);
+    document.getElementById('gantt-week-label').textContent =
+      'W' + visFrom + ' \u2013 W' + visTo + '  \u00b7  ' + fl.start + ' \u2192 ' + tl.end;
+  }
+
+  var cellW = ganttView === 'week' ? '86' : '42';
+
+  // ── Header row 1: W# labels ──
+  var hdr = '<tr><th class="gantt-label" rowspan="2" style="background:var(--surface2);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);border-right:1px solid var(--border2);vertical-align:middle;min-width:220px;padding:7px 10px;position:sticky;left:0;z-index:2">Task / Deliverable</th>';
+  visWeeks.forEach(function(w) {
+    var cur = w === CW;
+    var wd  = weekDates(w-1);
+    hdr += '<th class="gantt-week-hdr' + (cur ? ' gantt-current-week-hdr' : '') + '" style="min-width:' + cellW + 'px;text-align:center;padding:4px 2px 2px;border-bottom:1px solid var(--border);border-right:1px solid var(--border2)">'
+      + '<div style="font-size:' + (ganttView==='week'?'12':'10') + 'px;font-weight:700;color:' + (cur?'var(--indigo)':'var(--text2)') + '">W' + w + '</div>'
+      + '</th>';
+  });
+  hdr += '</tr>';
+
+  // ── Header row 2: date ranges ──
+  hdr += '<tr>';
+  visWeeks.forEach(function(w) {
+    var cur = w === CW;
+    var wd  = weekDates(w-1);
+    hdr += '<th class="gantt-week-hdr' + (cur ? ' gantt-current-week-hdr' : '') + '" style="text-align:center;padding:1px 2px 5px;border-bottom:2px solid var(--border);border-right:1px solid var(--border2)">'
+      + '<div style="font-size:8.5px;color:' + (cur?'var(--indigo)':'var(--text4)') + ';white-space:nowrap;letter-spacing:-0.3px">' + wd.start + '\u2013' + wd.end + '</div>'
+      + '</th>';
+  });
+  hdr += '</tr>';
+
+  // ── Task rows ──
+  var rows = '';
+  var lastPhase = null;
+  var ganttTasks = [];
+  TASKS.forEach(function(t) {
+    if (!ganttTasks.find(function(g){return g.task===t.task && g.phase===t.phase;})) ganttTasks.push(t);
+  });
+
+  var filtered = phaseFilter === 'all' ? ganttTasks : ganttTasks.filter(function(t){return t.phase===parseInt(phaseFilter);});
+
+  filtered.forEach(function(t) {
+    var ph = PHASES.find(function(p){return p.num===t.phase;});
+    if (!ph) return;
+
+    // Phase separator
+    if (t.phase !== lastPhase) {
+      lastPhase = t.phase;
+      var phaseCells = visWeeks.map(function(w){
+        return '<td class="gantt-cell' + (w===CW?' gantt-current-week':'') + '" style="background:' + ph.color + '0A;border-right:1px solid var(--border2)"></td>';
+      }).join('');
+      rows += '<tr class="gantt-phase-row">'
+        + '<td class="gantt-label gantt-phase-label" style="border-left:3px solid ' + ph.color + ';padding:6px 10px;position:sticky;left:0;z-index:1;background:var(--surface2)">'
+        + '<span style="font-size:10.5px;color:var(--text2)">\u258c Phase ' + t.phase + ' \u2014 ' + ph.name + '</span>'
+        + '<span style="font-size:9px;color:var(--text4);margin-left:6px">' + ph.weeks + '</span>'
+        + '</td>' + phaseCells + '</tr>';
+    }
+
+    // Compute start/end week from dates
+    var startWeekNum = parseInt((t.week||'W1').replace('W','')) || 1;
+    var endWeekNum   = startWeekNum;
+    var sd = parseTaskDate(t.start);
+    var ed = parseTaskDate(t.end);
+    if (sd && ed) {
+      var diffDays = Math.round((ed - sd) / 86400000);
+      endWeekNum = startWeekNum + Math.max(0, Math.floor(diffDays / 7));
+    }
+    endWeekNum = Math.min(18, Math.max(startWeekNum, endWeekNum));
+
+    // Skip if outside visible range
+    if (endWeekNum < visFrom || startWeekNum > visTo) return;
+
+    var isGTM = t.owners.indexOf('Amrut') >= 0 && !t.owners.some(function(o){return ['Rani','Faizan','Ashutosh','Intern 1','Intern 2'].indexOf(o)>=0;});
+    var baseColor  = isGTM ? '#10B981' : ph.color;
+    var opacityHex = t.status==='Done' ? '55' : t.status==='Blocked' ? 'AA' : 'CC';
+
+    var ownersShort = (t.owners||[]).slice(0,2).join(', ') + ((t.owners||[]).length>2?'+':'');
+    var tooltip     = (t.task + ' | ' + (t.start||'') + ' to ' + (t.end||'') + ' | ' + (t.owners||[]).join(', ') + ' | ' + t.status).replace(/"/g,"'");
+
+    var taskCells = visWeeks.map(function(w) {
+      var cur     = w === CW;
+      var inRange = w >= startWeekNum && w <= endWeekNum;
+      var cellBase= '<td class="gantt-cell' + (cur?' gantt-current-week':'') + '" style="padding:2px 1px;border-right:1px solid var(--border2)">';
+      if (!inRange) return cellBase + '</td>';
+
+      var isStart = w === startWeekNum;
+      var isEnd   = w === endWeekNum;
+      var rad = isStart && isEnd ? '4px' : isStart ? '4px 0 0 4px' : isEnd ? '0 4px 4px 0' : '0';
+
+      var barBg = t.status === 'Blocked'
+        ? 'repeating-linear-gradient(135deg,#EF4444CC,#EF4444CC 3px,#EF444444 3px,#EF444444 6px)'
+        : (t.status === 'Done' ? baseColor+'55' : baseColor+opacityHex);
+
+      var innerLabel = '';
+      if (ganttView === 'week' && isStart && t.start) {
+        innerLabel = '<span style="font-size:8px;color:#fff;padding:0 4px;opacity:0.9;white-space:nowrap;overflow:hidden">' + t.start + '</span>';
+      }
+      if (ganttView === 'week' && isEnd && !isStart && t.end) {
+        innerLabel += '<span style="font-size:8px;color:#fff;padding:0 4px;opacity:0.9;white-space:nowrap;overflow:hidden;margin-left:auto">' + t.end + '</span>';
+      }
+
+      return cellBase
+        + '<div style="height:20px;border-radius:' + rad + ';background:' + barBg + ';display:flex;align-items:center;'
+        + (t.status==='Done'?'border:1px solid '+baseColor+'99;':'')
+        + '">' + innerLabel + '</div></td>';
+    }).join('');
+
+    rows += '<tr title="' + tooltip + '">'
+      + '<td class="gantt-label" style="padding:5px 10px;border-right:1px solid var(--border2);position:sticky;left:0;background:var(--surface);z-index:1">'
+      +   '<div style="font-size:11px;color:var(--text2);line-height:1.3">' + (t.task.length>46?t.task.slice(0,46)+'\u2026':t.task) + '</div>'
+      +   '<div style="display:flex;gap:8px;align-items:center;margin-top:2px">'
+      +     '<span style="font-size:9.5px;color:var(--text4)">' + ownersShort + '</span>'
+      +     '<span style="font-size:9px;color:var(--text4);opacity:0.7">' + (t.start||'') + (t.end&&t.end!==t.start?' \u2013 '+t.end:'') + '</span>'
+      +   '</div>'
+      + '</td>'
+      + taskCells
+      + '</tr>';
+  });
+
+  document.getElementById('gantt-table').innerHTML = hdr + rows;
+}
+
+
+// ══════════════════════════════════════════════════════
+// WORKLOAD
+// ══════════════════════════════════════════════════════
+
+function buildWorkload() {
+  const weeks = Array.from({length:18},(_,i)=>`W${i+1}`);
+
+  let hdr = `<th style="padding:9px 12px;text-align:left;background:var(--surface2);color:var(--text3);font-size:11px;font-weight:700;white-space:nowrap;border-bottom:1px solid var(--border)">Team Member</th>
+    <th style="padding:9px 12px;text-align:left;background:var(--surface2);color:var(--text3);font-size:10px;font-weight:700;border-bottom:1px solid var(--border)">Role</th>`;
+  weeks.forEach(w => {
+    hdr += `<th style="padding:9px 4px;text-align:center;background:var(--surface2);color:var(--text3);font-size:10px;font-weight:700;min-width:44px;border-bottom:1px solid var(--border)">${w}</th>`;
+  });
+  document.getElementById('workload-head').innerHTML = hdr;
+
+  let body = '';
+  WORKLOAD.forEach(r=>{
+    const c = ownerColor(r.member);
+    body += `<tr>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--border2)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:28px;height:28px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 0 10px ${c}55">${r.member[0]}</div>
+          <span style="font-size:13px;font-weight:600;color:var(--text)">${r.member}</span>
+        </div>
+      </td>
+      <td style="padding:8px 12px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border2);white-space:nowrap">${r.role}</td>
+      ${r.weeks.map(n=>{
+        let cls='wl-0', label='–';
+        if(n>=7){cls='wl-5';label=n;}
+        else if(n>=5){cls='wl-4';label=n;}
+        else if(n>=3){cls='wl-3';label=n;}
+        else if(n>=1){cls='wl-1';label=n;}
+        else if(n===2||n===1){cls='wl-2';label=n;}
+        // fix: redefine properly
+        if(n===0){cls='wl-0';label='–';}
+        else if(n<=2){cls='wl-1';label=n;}
+        else if(n<=4){cls='wl-2';label=n;}
+        else if(n<=6){cls='wl-3';label=n;}
+        else{cls='wl-4';label=n;}
+        return `<td class="workload-cell ${cls}" style="border-bottom:1px solid var(--border2)">${label}</td>`;
+      }).join('')}
+    </tr>`;
+  });
+  document.getElementById('workload-body').innerHTML = body;
+}
+
+// ══════════════════════════════════════════════════════
+// GTM
+// ══════════════════════════════════════════════════════
+
+function buildGTM() {
+  let html = `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic">${GTM_DATA.note}</div>`;
+  GTM_DATA.tracks.forEach((track, ti)=>{
+    html += `<div class="gtm-track">
+      <div class="gtm-track-header" style="background:var(--surface2);border-left:4px solid ${track.color};">
+        <span style="width:8px;height:8px;border-radius:50%;background:${track.color};display:inline-block;margin-right:8px;vertical-align:middle;flex-shrink:0;"></span>${track.title}
+      </div>
+      <div class="gtm-track-body">
+        <div class="gtm-note">${track.note}</div>
+        <div class="tbl-wrap">
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+            <thead>
+              <tr style="background:var(--surface2);border-bottom:1px solid var(--border)">
+                <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);white-space:nowrap">Weeks</th>
+                <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);min-width:220px">Task</th>
+                <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border)">Owner</th>
+                <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);min-width:200px">Deliverable</th>
+                <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border)">Status</th>
+                <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);min-width:140px">Notes</th>
+              </tr>
+            </thead>
+            <tbody>`;
+    track.tasks.forEach((task, gi)=>{
+      const {bg, col} = statusColors(task.status);
+      html += `<tr style="border-bottom:1px solid var(--border2)">
+        <td style="padding:8px 10px;font-size:11px;font-weight:700;color:var(--text3);white-space:nowrap">${task.weeks}</td>
+        <td style="padding:8px 10px;font-weight:500;color:var(--text)">${task.task}</td>
+        <td style="padding:8px 10px">${task.owner.split(', ').map(o=>ownerTag(o.trim())).join('')}</td>
+        <td style="padding:8px 10px;font-size:11.5px;color:var(--text3)">${task.deliverable}</td>
+        <td style="padding:8px 10px">
+          <select class="status-select" style="background:${bg};color:${col}" data-store="gtm" data-track="${ti}" data-gidx="${gi}" onchange="updateStatus(this)">
+            ${['Not Started','In Progress','Done','Blocked','Conditional'].map(s=>`<option value="${s}"${s===task.status?' selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+        <td style="padding:8px 10px;font-size:11px;color:var(--text3);font-style:italic">${task.notes}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div></div></div>`;
+  });
+  document.getElementById('gtm-content').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════
+// GOOGLE APPS SCRIPT SYNC
+// ══════════════════════════════════════════════════════
+
+const GAS_URL = ''; // ← PASTE YOUR WEB APP URL HERE after Step 4
+
+let syncEnabled = false;
+let lastSyncTime = null;
+let syncPollInterval = null;
+
+function isSyncConfigured() {
+  const u = getGASUrl();
+  return u && u.startsWith('https://script.google.com');
+}
+
+// ── Pull latest data from Sheet ──
+// Normalise any date string from the sheet into "DD Mon" (tasks) or "DD Mon YYYY" (milestones).
+// Handles raw GAS Date.toString(), ISO strings, locale strings, and already-correct "09 Mar" format.
+function normDateStr(s, withYear) {
+  if (!s || typeof s !== 'string') return '';
+  s = s.trim();
+  if (!s) return '';
+  var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // Already in correct format — "09 Mar" or "09 Mar 2026"
+  var p = s.split(' ');
+  if (p.length >= 2 && MON.indexOf(p[1]) >= 0) return s;
+  // Try native Date parse (handles ISO, locale, GAS toString, etc.)
+  var d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    var day = ('0' + d.getDate()).slice(-2);
+    var mon = MON[d.getMonth()];
+    return withYear ? day + ' ' + mon + ' ' + d.getFullYear() : day + ' ' + mon;
+  }
+  return s; // return raw if all parsing fails
+}
+
+async function pullFromSheet() {
+  if (!isSyncConfigured()) return;
+  try {
+    setSyncStatus('syncing');
+    const res = await fetch(getGASUrl() + '?action=get&cachebust=' + Date.now(), { method: 'GET', redirect: 'follow' });
+    const data = await res.json();
+    if (!data.success && data.error) throw new Error(data.error);
+
+    // ── Sync ALL tasks from sheet — matched by row position so renames update name, not delete+add ──
+    if (data.tasks && Array.isArray(data.tasks)) {
+      data.tasks.forEach((row, idx) => {
+        if (!row.task || !row.task.trim()) return;
+        if (idx < TASKS.length) {
+          const t = TASKS[idx];
+          t.task = row.task.trim();
+          if (row.status)                         t.status   = row.status;
+          if (row.notes !== undefined)            t.notes    = String(row.notes || '');
+          if (row.week  && row.week.trim())        t.week     = row.week.trim();
+          if (row.phase)                           t.phase    = Number(row.phase);
+          if (row.priority && row.priority.trim()) t.priority = row.priority.trim();
+          t.start = normDateStr(String(row.start || ''), false) || t.start;
+          t.end   = normDateStr(String(row.end   || ''), false) || t.end;
+          if (typeof row.owners === 'string')
+            t.owners = row.owners.split(',').map(o => o.trim()).filter(Boolean);
+        } else {
+          TASKS.push({
+            task:     row.task.trim(),
+            phase:    row.phase    ? Number(row.phase)   : 1,
+            week:     row.week     ? row.week.trim()     : 'W1',
+            owners:   typeof row.owners === 'string' ? row.owners.split(',').map(o=>o.trim()).filter(Boolean) : [],
+            priority: row.priority ? row.priority.trim() : 'Med',
+            start:    normDateStr(String(row.start || ''), false),
+            end:      normDateStr(String(row.end   || ''), false),
+            status:   row.status  || 'Not Started',
+            notes:    row.notes   ? String(row.notes) : '',
+            days: 1
+          });
+        }
+      });
+      if (data.tasks.length < TASKS.length) TASKS.splice(data.tasks.length);
+    }
+    // ── Sync ALL milestones from sheet — matched by row position so renames update name, not delete+add ──
+    if (data.milestones && Array.isArray(data.milestones)) {
+      data.milestones.forEach((row, idx) => {
+        if (!row.milestone || !row.milestone.trim()) return;
+        if (idx < MILESTONES.length) {
+          const m = MILESTONES[idx];
+          m.milestone = row.milestone.trim();
+          if (row.status)                          m.status        = row.status;
+          if (row.week  && row.week.trim())         m.week          = row.week.trim();
+          if (row.phase)                            m.phase         = Number(row.phase);
+          m.date = normDateStr(String(row.date || ''), true) || m.date;
+          if (row.criteria !== undefined)           m.criteria      = String(row.criteria || '');
+          if (row.achieved_date && row.achieved_date.trim()) m.achieved_date = row.achieved_date.trim();
+          if (typeof row.owners === 'string')
+            m.owners = row.owners.split(',').map(o => o.trim()).filter(Boolean);
+        } else {
+          MILESTONES.push({
+            milestone:     row.milestone.trim(),
+            phase:         row.phase ? Number(row.phase) : 1,
+            week:          row.week  ? row.week.trim()   : 'W1',
+            date:          normDateStr(String(row.date || ''), true),
+            owners:        typeof row.owners === 'string' ? row.owners.split(',').map(o=>o.trim()).filter(Boolean) : [],
+            status:        row.status   || 'Not Started',
+            criteria:      row.criteria ? String(row.criteria) : '',
+            achieved_date: row.achieved_date ? row.achieved_date.trim() : ''
+          });
+        }
+      });
+      if (data.milestones.length < MILESTONES.length) MILESTONES.splice(data.milestones.length);
+    }
+
+    lastSyncTime = new Date();
+    setSyncStatus('synced');
+    // Rebuild ALL views — every field may have changed from sheet
+    updateHeaderStats();
+    buildOverview();
+    buildTracker();
+    buildMilestones();
+    buildGantt();
+    buildWorkload();
+    buildGTM();
+  } catch(e) {
+    setSyncStatus('error', e.message);
+  }
+}
+
+// ── Push a single task change to Sheet ──
+async function pushTaskToSheet(taskName, field, value) {
+  if (!isSyncConfigured()) return;
+  setSyncStatus('saving');
+  try {
+    const res = await fetch(getGASUrl(), {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'updateTask', task: taskName, field: field, value: value })
+    });
+    const data = await res.json();
+    if (!data.success && data.error) throw new Error(data.error);
+    lastSyncTime = new Date();
+    setSyncStatus('synced');
+  } catch(e) {
+    setSyncStatus('error', e.message);
+  }
+}
+
+// ── Push a milestone status change ──
+async function pushMilestoneToSheet(milestoneName, status) {
+  if (!isSyncConfigured()) return;
+  setSyncStatus('saving');
+  try {
+    const res = await fetch(getGASUrl(), {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'updateMilestone', milestone: milestoneName, status: status })
+    });
+    const data = await res.json();
+    if (!data.success && data.error) throw new Error(data.error);
+    setSyncStatus('synced');
+  } catch(e) {
+    setSyncStatus('error', e.message);
+  }
+}
+
+// ── Sync status indicator ──
+function setSyncStatus(state, msg) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  const states = {
+    synced:  { text: '✓ Synced',   bg: 'rgba(45,212,191,0.15)',   col: '#2DD4BF', border: 'rgba(45,212,191,0.3)' },
+    syncing: { text: '⟳ Syncing…', bg: 'rgba(56,189,248,0.15)',   col: '#38BDF8', border: 'rgba(56,189,248,0.3)' },
+    saving:  { text: '↑ Saving…',  bg: 'rgba(251,191,36,0.15)',   col: '#FBBF24', border: 'rgba(251,191,36,0.3)' },
+    error:   { text: '⚠ ' + (msg||'Sync error'), bg: 'rgba(248,113,113,0.15)', col: '#F87171', border: 'rgba(248,113,113,0.3)' },
+    offline: { text: '○ Not connected', bg: 'rgba(90,122,158,0.1)', col: '#5A7A9E', border: 'rgba(90,122,158,0.2)' },
+  };
+  const s = states[state] || states.offline;
+  el.textContent = s.text;
+  el.style.background = s.bg;
+  el.style.color = s.col;
+  el.style.borderColor = s.border;
+  if (lastSyncTime && state === 'synced') {
+    el.title = 'Last synced: ' + lastSyncTime.toLocaleTimeString();
+  }
+}
+
+// ── Connect / URL helpers ──
+function connectGAS() {
+  const input = document.getElementById('gas-url-input');
+  const url = input ? input.value.trim() : '';
+  if (!url.startsWith('https://script.google.com')) {
+    document.getElementById('setup-msg').innerHTML = '<span style="color:#F87171">⚠ Invalid URL. Must start with https://script.google.com/macros/s/</span>';
+    return;
+  }
+  window._GAS_URL_OVERRIDE = url;
+  try { localStorage.setItem('autodock_gas_url', url); } catch(e) {}
+  const shareUrl = buildShareUrl(url);
+  document.getElementById('setup-msg').innerHTML =
+    '<span style="color:#2DD4BF">✓ Connected! Now click <strong>↑ Push all data to Sheet</strong> once to seed the sheet.</span>' +
+    '<br><span style="color:var(--text3);font-size:10.5px;margin-top:6px;display:block">📎 Share this URL with teammates — they open it already connected:<br>' +
+    '<span style="color:#6C8EFF;word-break:break-all;user-select:all;cursor:text">' + shareUrl + '</span></span>';
+  hideBannerIfConnected();
+  startAutoSync();
+}
+
+function getGASUrl() {
+  return window._GAS_URL_OVERRIDE || GAS_URL;
+}
+
+function buildShareUrl(gasUrl) {
+  return window.location.origin + window.location.pathname + '?gas=' + encodeURIComponent(gasUrl);
+}
+
+function copyShareUrl() {
+  const url = getGASUrl();
+  if (!url) return;
+  const shareUrl = buildShareUrl(url);
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    const btn = document.getElementById('copy-share-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.style.color = '#2DD4BF';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = '#FBBF24'; }, 2000);
+  }).catch(() => { prompt('Copy this URL and share with teammates:', shareUrl); });
+}
+
+function hideBannerIfConnected() {
+  const banner = document.getElementById('setup-banner');
+  if (banner) banner.style.display = 'none';
+  const btn = document.getElementById('reconnect-link');
+  if (btn) btn.style.display = 'inline';
+}
+
+function showSetupBanner() {
+  const banner = document.getElementById('setup-banner');
+  if (banner) banner.style.display = 'flex';
+  const btn = document.getElementById('reconnect-link');
+  if (btn) btn.style.display = 'none';
+}
+
+async function pushAllToSheet() {
+  const url = getGASUrl();
+  if (!url || !url.startsWith('https://script.google.com')) {
+    document.getElementById('setup-msg').innerHTML = '<span style="color:#F87171">⚠ Connect a URL first.</span>';
+    return;
+  }
+  document.getElementById('setup-msg').innerHTML = '<span style="color:#FBBF24">⟳ Pushing all data to sheet…</span>';
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'initSheet',
+        tasks: TASKS,
+        milestones: MILESTONES
+      })
+    });
+    const data = await res.json();
+    if (!data.success && data.error) throw new Error(data.error);
+    const _gasUrl = getGASUrl();
+    const _shareUrl = _gasUrl ? buildShareUrl(_gasUrl) : '';
+    const _copyBtn = document.getElementById('copy-share-btn');
+    if (_copyBtn) _copyBtn.style.display = 'inline-flex';
+    document.getElementById('setup-msg').innerHTML =
+      '<span style="color:#2DD4BF">✓ ' + (data.message || 'All data pushed to Google Sheet!') + ' Auto-sync active (every 30s).</span>' +
+      (_shareUrl ? '<br><span style="color:var(--text3);font-size:10.5px;margin-top:6px;display:block">📎 <strong style="color:var(--text2)">Share this URL with teammates</strong> — opens tracker already connected:<br><span style="color:#6C8EFF;word-break:break-all;user-select:all;cursor:text">' + _shareUrl + '</span></span>' : '');
+  } catch(e) {
+    document.getElementById('setup-msg').innerHTML = '<span style="color:#F87171">⚠ Push failed: ' + e.message + '. Check that your Web App is deployed as "Anyone" access.</span>';
+  }
+}
+
+function startAutoSync() {
+  if (!isSyncConfigured()) { setSyncStatus('offline'); return; }
+  pullFromSheet();
+  syncPollInterval = setInterval(pullFromSheet, 30000);
+  setSyncStatus('syncing');
+}
+
+// ── Manual refresh button ──
+function manualSync() {
+  pullFromSheet();
+}
+
+// ══════════════════════════════════════════════════════
+// PATCH updateStatus to also push to sheet
+// ══════════════════════════════════════════════════════
+
+// updateStatus — pushes to sheet on every change
+function updateStatus(sel) {
+  const tr = sel.closest('tr');
+  const idx = +tr.dataset.idx;
+  const store = sel.dataset.store;
+  const val = sel.value;
+
+  if (store === 'task') {
+    TASKS[idx].status = val;
+    pushTaskToSheet(TASKS[idx].task, 'status', val);
+  } else if (store === 'milestone') {
+    MILESTONES[idx].status = val;
+    pushMilestoneToSheet(MILESTONES[idx].milestone, val);
+  } else if (store === 'gtm') {
+    const ti = +sel.dataset.track;
+    const gi = +sel.dataset.gidx;
+    GTM_DATA.tracks[ti].tasks[gi].status = val;
+  }
+  const {bg, col} = statusColors(val);
+  sel.style.background = bg; sel.style.color = col;
+  updateHeaderStats();
+}
+
+// Override saveNotes to also push
+function saveNotes(inp) {
+  const idx = +inp.dataset.idx;
+  TASKS[idx].notes = inp.value;
+  pushTaskToSheet(TASKS[idx].task, 'notes', inp.value);
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+
+// Auto-connect: reads ?gas= URL param first, then localStorage, then hardcoded GAS_URL
+(function bootGAS() {
+  const params      = new URLSearchParams(window.location.search);
+  const fromUrl     = params.get('gas');
+  const fromStorage = (() => { try { return localStorage.getItem('autodock_gas_url'); } catch(e) { return null; } })();
+  const resolved    = fromUrl || fromStorage || GAS_URL;
+  if (resolved && resolved.startsWith('https://script.google.com')) {
+    window._GAS_URL_OVERRIDE = resolved;
+    try { localStorage.setItem('autodock_gas_url', resolved); } catch(e) {}
+    const inp = document.getElementById('gas-url-input');
+    if (inp) inp.value = resolved;
+  }
+})();
+
+updateHeaderStats();
+buildOverview();
+buildTrackerFilters();
+buildTracker();
+buildMilestones();
+initGanttSelects();
+buildGantt();
+buildWorkload();
+buildGTM();
+
+// Start sync + hide banner if already configured
+startAutoSync();
+if (isSyncConfigured()) hideBannerIfConnected();
+</script>
+</body>
+</html>
