@@ -676,24 +676,6 @@ const TASKS = [
   { phase:5, week:'W7', task:'Safety Zone Monitor (safety zones + scan)', owners:["Rani"], priority:'High', days:1, start:'20 Apr', end:'24 Apr', status:'Not Started', notes:'' },
   { phase:5, week:'W8', task:'System Watchdog (heartbeat + timeout recovery)', owners:["Faizan"], priority:'High', days:1, start:'27 Apr', end:'01 May', status:'Not Started', notes:'' },
   { phase:5, week:'W10', task:'Fault Detection & Recovery (FSM-based)', owners:["Intern 1"], priority:'Med', days:1, start:'11 May', end:'15 May', status:'Not Started', notes:'' },
-  // Phase 6
-  { phase:6, week:'W9', task:'Grasp Pose Generator (GraspNet + sim data)', owners:["Rani"], priority:'High', days:1, start:'04 May', end:'15 May', status:'Not Started', notes:'' },
-  { phase:6, week:'W10', task:'MoveIt2 Motion Planner – configuration + planning scene', owners:["Faizan"], priority:'High', days:1, start:'11 May', end:'22 May', status:'Not Started', notes:'' },
-  { phase:6, week:'W11', task:'Trajectory Optimizer (Ruckig/TOTG)', owners:["Rani"], priority:'Med', days:1, start:'18 May', end:'29 May', status:'Not Started', notes:'' },
-  { phase:6, week:'W11', task:'Gripper Controller (vacuum/2-finger sim)', owners:["Faizan"], priority:'Med', days:1, start:'18 May', end:'22 May', status:'Not Started', notes:'' },
-  { phase:6, week:'W11', task:'Unloading Sequence Planner (row-by-row logic)', owners:["Rani"], priority:'High', days:1, start:'18 May', end:'29 May', status:'Not Started', notes:'' },
-  { phase:6, week:'W10', task:'Sim: Grasp + manipulation scenarios', owners:["Ashutosh"], priority:'Med', days:1, start:'11 May', end:'22 May', status:'Not Started', notes:'' },
-  { phase:6, week:'W11', task:'GTM: VC/investor deck v1 + pilot agreement template', owners:["Amrut"], priority:'High', days:1, start:'18 May', end:'29 May', status:'Not Started', notes:'' },
-  // Phase 7
-  { phase:7, week:'W11', task:'Mission FSM – full unloading mission orchestration', owners:["Rani"], priority:'High', days:1, start:'18 May', end:'29 May', status:'Not Started', notes:'' },
-  { phase:7, week:'W12', task:'Task Dispatcher (priority queue + load balance)', owners:["Faizan"], priority:'Med', days:1, start:'25 May', end:'05 Jun', status:'Not Started', notes:'' },
-  { phase:7, week:'W13', task:'Performance Profiler (latency dashboard)', owners:["Intern 1"], priority:'Med', days:1, start:'01 Jun', end:'12 Jun', status:'Not Started', notes:'' },
-  { phase:7, week:'W13', task:'Throughput Measurement (cartons/min benchmark)', owners:["Rani"], priority:'High', days:1, start:'01 Jun', end:'12 Jun', status:'Not Started', notes:'' },
-  { phase:7, week:'W14', task:'E2E Integration Test Suite (50+ scenarios)', owners:["Faizan", "Intern 1", "Intern 2"], priority:'High', days:1, start:'08 Jun', end:'26 Jun', status:'Not Started', notes:'' },
-  { phase:7, week:'W16', task:'Throughput optimisation: target ≥6 cartons/min', owners:["Rani", "Faizan"], priority:'High', days:1, start:'22 Jun', end:'03 Jul', status:'Not Started', notes:'' },
-  { phase:7, week:'W17', task:'Demo video production (3-min E2E sim demo)', owners:["Ashutosh", "Amrut"], priority:'High', days:1, start:'29 Jun', end:'10 Jul', status:'Not Started', notes:'' },
-  { phase:7, week:'W18', task:'Technical report: architecture + metrics + next steps', owners:["Rani", "Faizan"], priority:'High', days:1, start:'06 Jul', end:'10 Jul', status:'Not Started', notes:'' },
-  { phase:7, week:'W18', task:'GTM: final investor/partner pitch deck + demo', owners:["Amrut", "Nikunj"], priority:'High', days:1, start:'06 Jul', end:'10 Jul', status:'Not Started', notes:'' },
 ];
 
 const MILESTONES = [
@@ -723,16 +705,6 @@ const MILESTONES = [
   { phase:5, week:'W10', date:'15 May 2026', milestone:'Platform–Cobot Coordination (interlock FSM) preventing collisions', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
   { phase:5, week:'W9', date:'08 May 2026', milestone:'Retraction Sequence Manager fully validated in simulation', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
   { phase:5, week:'W8', date:'01 May 2026', milestone:'Safety Zone Monitor + System Watchdog operational', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
-  // Phase 6
-  { phase:6, week:'W10', date:'15 May 2026', milestone:'Grasp Pose Generator (GraspNet) producing ranked candidates in sim', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
-  { phase:6, week:'W12', date:'29 May 2026', milestone:'MoveIt2 motion planner executing collision-free trajectories', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
-  { phase:6, week:'W12', date:'29 May 2026', milestone:'Trajectory Optimizer (Ruckig/TOTG) producing smooth joint paths', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
-  { phase:6, week:'W12', date:'29 May 2026', milestone:'Unloading Sequence Planner completing full simulated container', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
-  // Phase 7
-  { phase:7, week:'W12', date:'29 May 2026', milestone:'Full E2E unloading mission running in simulation (docking → exit)', owners:["Rani", "Faizan", "Ashutosh"], criteria:'', status:'Not Started' },
-  { phase:7, week:'W12', date:'29 May 2026', milestone:'Mission FSM + Task Dispatcher orchestrating all subsystems', owners:["Rani"], criteria:'', status:'Not Started' },
-  { phase:7, week:'W16', date:'26 Jun 2026', milestone:'Throughput target: ≥6 cartons/min in simulation', owners:["Rani", "Faizan"], criteria:'', status:'Not Started' },
-  { phase:7, week:'W18', date:'10 Jul 2026', milestone:'90-day deliverable: Demo-ready simulation video + technical report', owners:["All"], criteria:'', status:'Not Started' },
 ];
 
 const WORKLOAD = [
